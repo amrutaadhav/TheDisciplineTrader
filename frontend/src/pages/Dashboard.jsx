@@ -9,15 +9,14 @@ export default function Dashboard() {
   const [trades, setTrades] = useState([]);
   
   useEffect(() => {
-    const saved = localStorage.getItem('disciplineTrader_journal');
-    if (saved) {
-      setTrades(JSON.parse(saved));
-    } else {
-      setTrades([
-        { id: 1, date: '14 Apr, 10:30 AM', pair: 'EUR/USD', setup: 'Breakout', rr: '1:4.5', pl: 120, rulesViolated: [] },
-        { id: 2, date: '13 Apr, 2:15 PM', pair: 'BTC/USD', setup: 'Support', rr: '1:3', pl: -50, rulesViolated: ['Wait for setup', 'No FOMO after missed entry'] }
-      ]);
-    }
+    fetch('http://localhost:5000/api/trades')
+      .then(res => res.json())
+      .then(data => {
+         if(Array.isArray(data)) {
+           setTrades(data.map(d => ({...d, id: d._id})));
+         }
+      })
+      .catch(err => console.error(err));
   }, []);
 
   const totalTrades = trades.length;

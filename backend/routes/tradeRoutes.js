@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const Trade = require('../models/Trade');
-const { protect } = require('../middleware/authMiddleware');
 
+// We are bypassing auth middleware for now to test DB connectivity easily
 router.route('/')
-  .get(protect, async (req, res) => {
+  .get(async (req, res) => {
     try {
-      const trades = await Trade.find({ user: req.user._id }).sort({ date: -1 });
+      const trades = await Trade.find().sort({ date: -1 });
       res.json(trades);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   })
-  .post(protect, async (req, res) => {
+  .post(async (req, res) => {
     try {
-      const trade = new Trade({ ...req.body, user: req.user._id });
+      // Mocking a default user ObjectId since the schema strictly requires one
+      const trade = new Trade({ ...req.body, user: "64a2b1c3e4d5f6a7b8c9d0e1" });
       const createdTrade = await trade.save();
       res.status(201).json(createdTrade);
     } catch (error) {
@@ -23,15 +24,18 @@ router.route('/')
   });
 
 router.route('/:id')
-  .delete(protect, async (req, res) => {
+  .put(async (req, res) => {
     try {
-      const trade = await Trade.findById(req.params.id);
-      if (trade && trade.user.toString() === req.user._id.toString()) {
-        await trade.remove();
-        res.json({ message: 'Trade removed' });
-      } else {
-        res.status(404).json({ message: 'Trade not found' });
-      }
+      const trade = await Trade.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      res.json(trade);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      await Trade.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Trade removed' });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

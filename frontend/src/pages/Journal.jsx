@@ -17,19 +17,18 @@ export default function Journal() {
     r8: { text: 'Wait for setup', checked: true }
   };
   
-  // Load from localStorage or default
-  const [trades, setTrades] = useState(() => {
-    const saved = localStorage.getItem('disciplineTrader_journal');
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, date: '14 Apr, 10:30 AM', pair: 'EUR/USD', setup: 'Breakout', entry: 1.1000, exit: 1.1050, rr: '1:4.5', pl: 120, notes: 'Followed plan perfectly.', rulesViolated: [] },
-      { id: 2, date: '13 Apr, 2:15 PM', pair: 'BTC/USD', setup: 'Support Bounce', entry: 64000, exit: 63800, rr: '1:3', pl: -50, notes: 'Jumped in early.', rulesViolated: ['Wait for setup', 'No FOMO after missed entry'] }
-    ];
-  });
+  const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem('disciplineTrader_journal', JSON.stringify(trades));
-  }, [trades]);
+    fetch('http://localhost:5000/api/trades')
+      .then(res => res.json())
+      .then(data => {
+         if(Array.isArray(data)) {
+           setTrades(data.map(d => ({...d, id: d._id})));
+         }
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   const [formData, setFormData] = useState({ pair: '', setup: '', entry: '', exit: '', rr: '', pl: '', notes: '' });
   const [rules, setRules] = useState(initialRules);
@@ -146,23 +145,35 @@ export default function Journal() {
       rr: formData.rr || 'Unknown',
       pl: Number(formData.pl) || 0,
       notes: formData.notes || '',
-      rulesViolated: violated
+      rulesViolated: violated,
+      date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })
     };
     
     if (editTradeId) {
-      setTrades(trades.map(t => t.id === editTradeId ? { ...t, ...tradeData } : t));
+      fetch(`http://localhost:5000/api/trades/${editTradeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradeData)
+      }).then(res => res.json()).then(updatedTrade => {
+        setTrades(trades.map(t => t.id === editTradeId ? { ...updatedTrade, id: updatedTrade._id } : t));
+        cancelEdit();
+      });
     } else {
-      const newTrade = {
-        id: Date.now(),
-        date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }),
-        ...tradeData
-      };
-      setTrades([newTrade, ...trades]);
+      fetch('http://localhost:5000/api/trades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradeData)
+      }).then(res => res.json()).then(newTrade => {
+        setTrades([{...newTrade, id: newTrade._id}, ...trades]);
+        cancelEdit();
+      });
     }
-    cancelEdit();
   };
 
-  const deleteTrade = (id) => setTrades(trades.filter(t => t.id !== id));
+  const deleteTrade = (id) => {
+    fetch(`http://localhost:5000/api/trades/${id}`, { method: 'DELETE' })
+      .then(() => setTrades(trades.filter(t => t.id !== id)));
+  };
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
@@ -192,8 +203,8 @@ export default function Journal() {
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5 z-10 w-full relative">
               <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Asset/Pair</label><input type="text" value={formData.pair} onChange={(e) => setFormData({...formData, pair: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors font-mono" placeholder="e.g. NQ, EURUSD" /></div>
               <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Setup Type</label><input type="text" value={formData.setup} onChange={(e) => setFormData({...formData, setup: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors" placeholder="e.g. Reversal, A+" /></div>
-              <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Entry Price</label><input type="number" value={formData.entry} onChange={(e) => setFormData({...formData, entry: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors font-mono" placeholder="0.00" /></div>
-              <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Exit Price</label><input type="number" value={formData.exit} onChange={(e) => setFormData({...formData, exit: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors font-mono" placeholder="0.00" /></div>
+              <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Entry Price ($)</label><input type="number" value={formData.entry} onChange={(e) => setFormData({...formData, entry: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors font-mono" placeholder="0.00" /></div>
+              <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Exit Price ($)</label><input type="number" value={formData.exit} onChange={(e) => setFormData({...formData, exit: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors font-mono" placeholder="0.00" /></div>
               <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Risk:Reward Ratio</label><input type="text" value={formData.rr} onChange={(e) => setFormData({...formData, rr: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors" placeholder="e.g. 1:4.5" /></div>
               <div className="flex flex-col"><label className="text-sm text-[#787B86] mb-1">Net P/L Amount ($)</label><input type="number" value={formData.pl} onChange={(e) => setFormData({...formData, pl: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#26A69A] focus:outline-none transition-colors font-mono font-bold" placeholder="e.g. 250 or -50" /></div>
               <div className="sm:col-span-2 flex flex-col"><label className="text-sm text-[#787B86] mb-1">Trade Notes</label><textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="bg-[#1E222D] p-3 rounded-xl border border-[#2B2B43] focus:border-[#2962FF] text-[#D1D4DC] focus:outline-none transition-colors h-24 resize-none" placeholder="What went well? What went wrong?"></textarea></div>
@@ -280,7 +291,7 @@ export default function Journal() {
                 <th className="p-4 pl-6">Time</th>
                 <th className="p-4">Symbol</th>
                 <th className="p-4">Side / Setup</th>
-                <th className="p-4">Price / Target</th>
+                <th className="p-4">Price / Target ($)</th>
                 <th className="p-4">P&L</th>
                 <th className="p-4">R:R</th>
                 <th className="p-4 border-r border-[#2B2B43]">Compliance</th>
@@ -296,7 +307,7 @@ export default function Journal() {
                   <td className="p-4 font-bold text-[#D1D4DC]">{trade.pair}</td>
                   <td className="p-4"><span className="text-xs font-sans text-[#787B86]">{trade.setup}</span></td>
                   <td className="p-4 text-[#D1D4DC]">
-                    <div className="flex items-center gap-1">{trade.entry} <span className="text-[#787B86]">→</span> {trade.exit}</div>
+                    <div className="flex items-center gap-1">${trade.entry} <span className="text-[#787B86]">→</span> ${trade.exit}</div>
                   </td>
                   <td className={`p-4 font-bold ${trade.pl >= 0 ? 'text-[#26A69A]' : 'text-[#EF5350]'}`}>
                       {trade.pl >= 0 ? '+' : ''}${trade.pl}
