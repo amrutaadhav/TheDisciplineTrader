@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { StreakProvider } from './context/StreakContext';
+import StreakWidget from './components/StreakWidget';
 import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import Routine from './pages/Routine';
@@ -81,6 +83,7 @@ function AppLayout() {
           <h2 className="text-lg font-semibold text-gray-200">Welcome back, {user?.name?.split(' ')[0] || 'Trader'} 👋</h2>
           <div className="flex items-center gap-4">
             <span className="text-sm font-semibold bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/30">Score: 100</span>
+            <StreakWidget />
             <ProfileMenu />
           </div>
         </header>
@@ -103,10 +106,12 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginRoute />} />
-          <Route path="/*" element={<AppLayout />} />
-        </Routes>
+        <StreakProvider>
+          <Routes>
+            <Route path="/login" element={<LoginRoute />} />
+            <Route path="/*" element={<AppLayout />} />
+          </Routes>
+        </StreakProvider>
       </AuthProvider>
     </Router>
   );
