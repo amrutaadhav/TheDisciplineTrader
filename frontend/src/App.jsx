@@ -61,9 +61,9 @@ function AppLayout() {
     <div className="flex h-screen bg-darkBg text-white w-full overflow-hidden font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-darkCard border-r border-[#333] flex flex-col p-4 shadow-xl z-10 transition-all duration-300">
-        <div className="flex items-center gap-2 mb-8 mt-2 px-2">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">DT</div>
-          <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary tracking-wide">Discipline Trader</h1>
+        <div className="flex items-center gap-3 mb-8 mt-2 px-2">
+          <img src="/logo.png" alt="The Discipline Trader Logo" className="w-9 h-9 rounded-xl shadow-[0_0_12px_rgba(41,98,255,0.4)] object-cover" />
+          <h1 className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2962FF] to-cyan-400 tracking-wide leading-tight">The Discipline<br/>Trader</h1>
         </div>
         <nav className="flex flex-col gap-3 font-medium">
           <Link to="/" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">📊</span>Dashboard</Link>

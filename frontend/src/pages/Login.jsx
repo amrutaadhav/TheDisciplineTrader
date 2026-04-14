@@ -82,11 +82,11 @@ export default function Login() {
       <div className="w-full max-w-md mx-4 relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2962FF] to-purple-600 flex items-center justify-center text-white font-black text-2xl shadow-[0_0_40px_rgba(41,98,255,0.3)] mb-4">
-            DT
+          <div className="w-20 h-20 rounded-2xl shadow-[0_0_50px_rgba(41,98,255,0.4)] mb-4 overflow-hidden border border-[#2B2B43]">
+            <img src="/logo.png" alt="The Discipline Trader" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2962FF] to-cyan-400">
-            Discipline Trader
+            The Discipline Trader
           </h1>
           <p className="text-[#787B86] text-sm mt-1">Trade with purpose. Win with discipline.</p>
         </div>
