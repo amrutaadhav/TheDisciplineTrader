@@ -29,9 +29,10 @@ export default function Dashboard() {
   const journalCompliance = totalTrades > 0 ? Math.round(((totalTrades * 8 - trades.reduce((acc, t) => acc + t.rulesViolated.length, 0)) / (totalTrades * 8)) * 100) : 100;
   const routineAvg = routineHistory.length > 0 ? Math.round(routineHistory.reduce((a, b) => a + b.score, 0) / routineHistory.length) : 0;
   const bankrollHealth = capital.startingAmount > 0 ? Math.min(100, Math.max(0, Math.round(((capital.liquidAmount + capital.bufferAmount) / capital.startingAmount) * 100))) : 100;
-  const mindGamesScore = 85; /* Mocked focus score */
+  const mindGamesScore = 85; 
+  const videoScore = 45; /* Mocked video progress */
   
-  const globalDisciplineScore = Math.round((journalCompliance + routineAvg + bankrollHealth + mindGamesScore) / 4);
+  const globalDisciplineScore = Math.round((journalCompliance + routineAvg + bankrollHealth + mindGamesScore + videoScore) / 5);
 
   // Generate Global Timeline Data
   const generateTimelineData = () => {
@@ -83,14 +84,15 @@ export default function Dashboard() {
             { x: 'Journal Rules', y: journalCompliance },
             { x: 'Routine Check', y: routineAvg },
             { x: 'Capital Equity', y: bankrollHealth },
-            { x: 'Mind Focus', y: mindGamesScore }
+            { x: 'Mind Focus', y: mindGamesScore },
+            { x: 'Edu Library', y: videoScore }
           ]}];
 
   return (
     <div className="flex flex-col gap-8 animate-fade-in bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8 pb-10">
       
       {/* Top Mastery Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#EF5350]/50 transition-colors">
           <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">📓 Journal</h3>
           <p className="text-3xl font-bold mt-2 text-[#D1D4DC]">{journalCompliance}%</p>
@@ -110,6 +112,11 @@ export default function Dashboard() {
           <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">🧠 Mind Games</h3>
           <p className="text-3xl font-bold mt-2 text-[#2962FF]">{mindGamesScore}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Focus Factor</span>
+        </div>
+        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-purple-500/50 transition-colors">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">🎬 Education</h3>
+          <p className="text-3xl font-bold mt-2 text-purple-400">{videoScore}%</p>
+          <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Course Mastery</span>
         </div>
       </div>
 
