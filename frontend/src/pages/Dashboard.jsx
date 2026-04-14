@@ -43,8 +43,8 @@ export default function Dashboard() {
     const dates = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
     
     dates.forEach((date, i) => {
-      const open = i === 0 ? baseScore : lineData[i-1].y;
-      const change = (Math.random() * 10) - (Math.random() * 4); // Slight upward bias
+      const open = i === 0 ? baseScore : Number(lineData[i-1].y);
+      const change = (Math.random() * 10) - (Math.random() * 4);
       const close = i === 6 ? globalDisciplineScore : Math.min(100, open + change);
       const high = Math.min(100, Math.max(open, close) + 3);
       const low = Math.max(0, Math.min(open, close) - 3);
