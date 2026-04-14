@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 
 export default function Journal() {
   const [showAdd, setShowAdd] = useState(false);
   const [editTradeId, setEditTradeId] = useState(null);
-  const [graphType, setGraphType] = useState('area'); // 'area' or 'candlestick'
-  
-  const [trades, setTrades] = useState([
-    { id: 1, date: '14 Apr, 10:30 AM', pair: 'EUR/USD', setup: 'Breakout', entry: 1.1000, exit: 1.1050, rr: '1:4.5', pl: 120, notes: 'Followed plan perfectly.', rulesViolated: [] },
-    { id: 2, date: '13 Apr, 2:15 PM', pair: 'BTC/USD', setup: 'Support Bounce', entry: 64000, exit: 63800, rr: '1:3', pl: -50, notes: 'Jumped in early.', rulesViolated: ['Wait for setup', 'No FOMO after missed entry'] },
-    { id: 3, date: '12 Apr, 9:00 AM', pair: 'AAPL', setup: 'Trend Continuation', entry: 170.5, exit: 175.0, rr: '1:5', pl: 300, notes: 'Great hold.', rulesViolated: [] },
-    { id: 4, date: '11 Apr, 1:00 PM', pair: 'NQ1!', setup: 'Mean Reversion', entry: 18000, exit: 17950, rr: '1:2', pl: -100, notes: 'Hit stop loss quickly.', rulesViolated: ['Min R:R 1:4'] },
-    { id: 5, date: '10 Apr, 10:00 AM', pair: 'GOLD', setup: 'Momentum', entry: 2350, exit: 2365, rr: '1:3', pl: 150, notes: 'Nice quick trade.', rulesViolated: [] },
-  ]);
-
-  const [formData, setFormData] = useState({ pair: '', setup: '', entry: '', exit: '', rr: '', pl: '', notes: '' });
+  const [graphType, setGraphType] = useState('area');
   
   const initialRules = {
     r1: { text: 'No overtrading', checked: true },
@@ -27,12 +17,27 @@ export default function Journal() {
     r8: { text: 'Wait for setup', checked: true }
   };
   
+  // Load from localStorage or default
+  const [trades, setTrades] = useState(() => {
+    const saved = localStorage.getItem('disciplineTrader_journal');
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: 1, date: '14 Apr, 10:30 AM', pair: 'EUR/USD', setup: 'Breakout', entry: 1.1000, exit: 1.1050, rr: '1:4.5', pl: 120, notes: 'Followed plan perfectly.', rulesViolated: [] },
+      { id: 2, date: '13 Apr, 2:15 PM', pair: 'BTC/USD', setup: 'Support Bounce', entry: 64000, exit: 63800, rr: '1:3', pl: -50, notes: 'Jumped in early.', rulesViolated: ['Wait for setup', 'No FOMO after missed entry'] }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('disciplineTrader_journal', JSON.stringify(trades));
+  }, [trades]);
+
+  const [formData, setFormData] = useState({ pair: '', setup: '', entry: '', exit: '', rr: '', pl: '', notes: '' });
   const [rules, setRules] = useState(initialRules);
   const [warningMessage, setWarningMessage] = useState('');
 
   const toggleRule = (key) => setRules(prev => ({ ...prev, [key]: { ...prev[key], checked: !prev[key].checked } }));
 
-  // Compute realistic Equity OHLC data 
+  // Generate Data for Graph & KPIs
   const generateGraphData = () => {
     let startingCapital = 10000;
     const sortedTrades = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -42,16 +47,16 @@ export default function Journal() {
     const lineData = [];
     lineData.push({ x: 'Start', y: startingCapital });
 
-    sortedTrades.forEach(t => {
+    sortedTrades.forEach((t, index) => {
       const pl = Number(t.pl);
       const open = currentCapital;
       const close = currentCapital + pl;
-      const volatility = Math.max(Math.abs(pl) * 0.4, 15); // Add realistic baseline volatility 
+      const volatility = Math.max(Math.abs(pl) * 0.4, 15);
       
       const high = Math.max(open, close) + (Math.random() * volatility);
       const low = Math.min(open, close) - (Math.random() * volatility);
       
-      const dateLabel = t.date.split(',')[0] + ' ' + t.pair;
+      const dateLabel = t.pair + ' (T' + (index + 1) + ')';
       
       candleData.push({ x: dateLabel, y: [open.toFixed(2), high.toFixed(2), low.toFixed(2), close.toFixed(2)] });
       lineData.push({ x: dateLabel, y: close.toFixed(2) });
@@ -59,88 +64,63 @@ export default function Journal() {
       currentCapital = close;
     });
 
-    return { candleData, lineData, finalBalance: currentCapital - startingCapital };
+    // Rule Compliance logic: Percentage of Total Checked Rules vs Total Possible
+    const totalPossibleRules = trades.length * 8;
+    const totalViolatedRules = trades.reduce((acc, t) => acc + t.rulesViolated.length, 0);
+    const compliancePercent = trades.length > 0 ? Math.round(((totalPossibleRules - totalViolatedRules) / totalPossibleRules) * 100) : 100;
+
+    // Total Net P/L
+    const totalPL = trades.reduce((acc, t) => acc + Number(t.pl), 0);
+
+    return { candleData, lineData, finalBalance: totalPL, compliancePercent };
   };
 
-  const { candleData, lineData, finalBalance } = generateGraphData();
+  const { candleData, lineData, finalBalance, compliancePercent } = generateGraphData();
 
   const chartOptions = {
     chart: { 
       background: '#121212',
-      toolbar: { 
-        show: true, 
-        tools: { pan: true, zoom: true, reset: true, download: false }
-      },
+      toolbar: { show: true, tools: { pan: true, zoom: true, reset: true, download: false } },
       fontFamily: 'Inter, sans-serif'
     },
     theme: { mode: 'dark' },
-    colors: graphType === 'area' ? ['#2962FF'] : undefined, // TradingView Blue
-    stroke: { curve: 'straight', width: graphType === 'area' ? 2 : 1 }, // TV uses straight lines for areas
+    colors: graphType === 'area' ? ['#2962FF'] : undefined,
+    stroke: { curve: 'straight', width: graphType === 'area' ? 2 : 1 },
     fill: graphType === 'area' ? {
       type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.4,
-        opacityTo: 0.05,
-        stops: [0, 100]
-      }
+      gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
     } : {},
     xaxis: { 
       type: 'category',
-      labels: { style: { colors: '#787B86', fontSize: '11px' } }, // TV style muted text
+      labels: { style: { colors: '#787B86', fontSize: '11px' } },
       axisBorder: { show: true, color: '#2B2B43' },
       axisTicks: { show: true, color: '#2B2B43' },
       crosshairs: { show: true, stroke: { color: '#787B86', width: 1, dashArray: 4 } }
     },
     yaxis: {
-      opposite: true, // TV price scale is on the right
-      labels: { 
-        style: { colors: '#787B86', fontSize: '11px' },
-        formatter: (value) => value.toFixed(2) // TV shows precise decimals
-      },
+      opposite: true,
+      labels: { style: { colors: '#787B86', fontSize: '11px' }, formatter: (value) => value.toFixed(2) },
       crosshairs: { show: true }
     },
-    grid: { borderColor: '#1E222D', strokeDashArray: 0 }, // TV style solid faint grid
+    grid: { borderColor: '#1E222D', strokeDashArray: 0 },
     dataLabels: { enabled: false },
     plotOptions: {
-      candlestick: {
-        colors: { upward: '#26A69A', downward: '#EF5350' }, // TradingView native Green/Red
-        wick: { useDataColor: true }
-      }
+      candlestick: { colors: { upward: '#26A69A', downward: '#EF5350' }, wick: { useDataColor: true } }
     },
-    tooltip: { 
-      theme: 'dark',
-      x: { format: 'dd MMM' }
-    }
+    tooltip: { theme: 'dark' }
   };
 
-  const series = graphType === 'area' 
-    ? [{ name: 'Balance', data: lineData }]
-    : [{ name: 'Equity OHLC', data: candleData }];
+  const series = graphType === 'area' ? [{ name: 'Balance', data: lineData }] : [{ name: 'Equity OHLC', data: candleData }];
 
   const handleEditClick = (trade) => {
-    setFormData({
-      pair: trade.pair,
-      setup: trade.setup,
-      entry: trade.entry,
-      exit: trade.exit,
-      rr: trade.rr,
-      pl: trade.pl,
-      notes: trade.notes || ''
-    });
-    
-    // Reverse engineer rules
+    setFormData({ pair: trade.pair, setup: trade.setup, entry: trade.entry, exit: trade.exit, rr: trade.rr, pl: trade.pl, notes: trade.notes || '' });
     const newRules = { ...initialRules };
     Object.keys(newRules).forEach(k => {
-      if (trade.rulesViolated.includes(newRules[k].text)) {
-        newRules[k].checked = false;
-      }
+      if (trade.rulesViolated.includes(newRules[k].text)) newRules[k].checked = false;
     });
-    
     setRules(newRules);
     setEditTradeId(trade.id);
     setShowAdd(true);
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -179,7 +159,6 @@ export default function Journal() {
       };
       setTrades([newTrade, ...trades]);
     }
-    
     cancelEdit();
   };
 
@@ -192,22 +171,22 @@ export default function Journal() {
           <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#2962FF] to-cyan-400">Trading Journal</h2>
           <p className="text-[#787B86] mt-1">Review your actions, learn from patterns.</p>
         </div>
-        <button onClick={() => showAdd ? cancelEdit() : setShowAdd(true)} className={`transition-all px-6 py-2 rounded-xl font-bold shadow-lg ${showAdd ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-[#2962FF] hover:bg-[#2962FF]/80 text-white shadow-[#2962FF]/20'}`}>
+        <button onClick={() => showAdd ? cancelEdit() : setShowAdd(true)} className={`transition-all px-6 py-2 rounded-xl font-bold shadow-lg ${showAdd ? 'bg-[#EF5350]/20 text-[#EF5350] border border-[#EF5350]/50' : 'bg-[#2962FF] hover:bg-[#2962FF]/80 text-white shadow-[#2962FF]/20'}`}>
           {showAdd ? 'Cancel' : '+ New Trade'}
         </button>
       </div>
 
       {warningMessage && (
-        <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-xl flex items-center justify-between">
-          <p className="text-red-400 font-semibold">{warningMessage}</p>
-          <button onClick={() => setWarningMessage('')} className="text-red-500 font-bold hover:text-white">✕</button>
+        <div className="bg-[#EF5350]/10 border-l-4 border-[#EF5350] p-4 rounded-r-xl flex items-center justify-between">
+          <p className="text-[#EF5350] font-semibold">{warningMessage}</p>
+          <button onClick={() => setWarningMessage('')} className="text-[#EF5350] font-bold hover:text-white">✕</button>
         </div>
       )}
 
       {showAdd && (
         <div className="bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#2962FF]/5 blur-[100px] pointer-events-none"></div>
-          <h3 className="text-xl font-bold text-white mb-6">{editTradeId ? 'Update Execution' : 'Log New execution'}</h3>
+          <h3 className="text-xl font-bold text-white mb-6">{editTradeId ? 'Update Execution' : 'Log New Execution'}</h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5 z-10 w-full relative">
@@ -221,7 +200,7 @@ export default function Journal() {
             </div>
 
             <div className="bg-[#1E222D] border border-[#2B2B43] rounded-2xl p-5 z-10 w-full relative">
-              <h4 className="text-[#2962FF] font-bold mb-4 flex items-center gap-2">🛑 Pre-Trade Rules Checklist</h4>
+              <h4 className="text-[#2962FF] font-bold mb-4 flex items-center gap-2">🛑 Pre-Trade Rules</h4>
               <p className="text-xs text-[#787B86] mb-4 pb-4 border-b border-[#2B2B43]">Unchecking these implies you broke discipline on this trade.</p>
               <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                 {Object.entries(rules).map(([key, rule]) => (
@@ -251,33 +230,24 @@ export default function Journal() {
                 <h3 className="text-lg font-bold text-[#D1D4DC]">Equity Chart</h3>
                 <span className="bg-[#1E222D] text-[#787B86] text-xs px-2 py-1 rounded font-mono border border-[#2B2B43]">1D</span>
               </div>
-              
               <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43]">
                 <button 
                   onClick={() => setGraphType('area')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'area' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M7 14l5-5 4 4 5-5"/></svg>
-                  Line
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M7 14l5-5 4 4 5-5"/></svg> Line
                 </button>
                 <button 
                   onClick={() => setGraphType('candlestick')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'candlestick' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 4v16"/><path d="M15 4v16"/><path d="M7 8h4v8H7zm6-2h4v12h-4z"/></svg>
-                  Candles
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 4v16"/><path d="M15 4v16"/><path d="M7 8h4v8H7zm6-2h4v12h-4z"/></svg> Candles
                 </button>
               </div>
             </div>
             
             <div className="w-full relative flex-1 min-h-[350px]">
-              <Chart 
-                options={chartOptions} 
-                series={series} 
-                type={graphType === 'area' ? 'area' : 'candlestick'} 
-                height="100%" 
-                width="100%" 
-              />
+              <Chart options={chartOptions} series={series} type={graphType === 'area' ? 'area' : 'candlestick'} height="100%" width="100%" />
             </div>
           </div>
           <div className="flex flex-col gap-4">
@@ -288,9 +258,9 @@ export default function Journal() {
               </span>
             </div>
             <div className="bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-xl flex-1 flex flex-col justify-center items-center relative overflow-hidden">
-              <span className="text-[#787B86] text-sm font-medium uppercase tracking-wider">Rule Compliance</span>
+              <span className="text-[#787B86] text-sm font-medium uppercase tracking-wider text-center">Cumulative Rule<br/>Compliance</span>
               <span className="text-4xl font-black mt-2 text-[#E2B714] font-mono relative z-10">
-                {trades.length > 0 ? Math.round((trades.filter(t => t.rulesViolated.length === 0).length / trades.length) * 100) : 100}%
+                {compliancePercent}%
               </span>
             </div>
           </div>
@@ -324,9 +294,7 @@ export default function Journal() {
                 <tr key={trade.id} className="border-b border-[#2A2E39] hover:bg-[#1E222D] transition-colors font-mono text-sm">
                   <td className="p-4 pl-6 text-[#D1D4DC]">{trade.date}</td>
                   <td className="p-4 font-bold text-[#D1D4DC]">{trade.pair}</td>
-                  <td className="p-4">
-                    <span className="text-xs font-sans text-[#787B86]">{trade.setup}</span>
-                  </td>
+                  <td className="p-4"><span className="text-xs font-sans text-[#787B86]">{trade.setup}</span></td>
                   <td className="p-4 text-[#D1D4DC]">
                     <div className="flex items-center gap-1">{trade.entry} <span className="text-[#787B86]">→</span> {trade.exit}</div>
                   </td>
