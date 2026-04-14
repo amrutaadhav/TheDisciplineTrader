@@ -85,39 +85,38 @@ export default function Dashboard() {
             { x: 'Routine Check', y: routineAvg },
             { x: 'Capital Equity', y: bankrollHealth },
             { x: 'Mind Focus', y: mindGamesScore },
-            { x: 'Edu Library', y: videoScore }
+            { x: 'Videos', y: videoScore }
           ]}];
 
   return (
     <div className="flex flex-col gap-8 animate-fade-in bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8 pb-10">
       
-      {/* Top Mastery Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#EF5350]/50 transition-colors">
-          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">📓 Journal</h3>
+        <Link to="/journal" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#EF5350]/50 transition-colors cursor-pointer group">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">📓 Journal</h3>
           <p className="text-3xl font-bold mt-2 text-[#D1D4DC]">{journalCompliance}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Rule Compliance</span>
-        </div>
-        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#26A69A]/50 transition-colors">
-          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">✅ Routine</h3>
+        </Link>
+        <Link to="/routine" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#26A69A]/50 transition-colors cursor-pointer group">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">✅ Routine</h3>
           <p className="text-3xl font-bold mt-2 text-[#26A69A]">{routineAvg}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Task Completion</span>
-        </div>
-        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#E2B714]/50 transition-colors">
-          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">💰 Bankroll</h3>
+        </Link>
+        <Link to="/capital" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#E2B714]/50 transition-colors cursor-pointer group">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">💰 Bankroll</h3>
           <p className="text-3xl font-bold mt-2 text-[#E2B714]">{bankrollHealth}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Equity Health</span>
-        </div>
-        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#2962FF]/50 transition-colors">
-          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">🧠 Mind Games</h3>
+        </Link>
+        <Link to="/mindgames" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#2962FF]/50 transition-colors cursor-pointer group">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">🧠 Mind Games</h3>
           <p className="text-3xl font-bold mt-2 text-[#2962FF]">{mindGamesScore}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Focus Factor</span>
-        </div>
-        <div className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-purple-500/50 transition-colors">
-          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2">🎬 Education</h3>
+        </Link>
+        <Link to="/videos" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-purple-500/50 transition-colors cursor-pointer group">
+          <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">🎬 Videos</h3>
           <p className="text-3xl font-bold mt-2 text-purple-400">{videoScore}%</p>
           <span className="text-[10px] text-[#787B86] uppercase tracking-wider">Course Mastery</span>
-        </div>
+        </Link>
       </div>
 
       {/* Main Global Graph Section */}

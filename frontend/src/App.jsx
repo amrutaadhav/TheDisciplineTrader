@@ -21,7 +21,7 @@ function App() {
             <Link to="/journal" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">📓</span>Journal</Link>
             <Link to="/routine" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">✅</span>Routine</Link>
             <Link to="/capital" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">💰</span>Bankroll</Link>
-            <Link to="/videos" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🎬</span>Library</Link>
+            <Link to="/videos" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🎬</span>Videos</Link>
             <Link to="/mindgames" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🧠</span>Mind Games</Link>
           </nav>
         </aside>
