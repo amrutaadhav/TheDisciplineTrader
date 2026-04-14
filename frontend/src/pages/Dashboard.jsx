@@ -70,7 +70,7 @@ export default function Dashboard() {
     yaxis: { min: 0, max: 100, labels: { style: { colors: '#787B86', fontSize: '11px' }, formatter: (v) => v.toFixed(0) + (graphType === 'bar' ? '%' : '') }},
     plotOptions: {
       candlestick: { colors: { upward: '#26A69A', downward: '#EF5350' }, wick: { useDataColor: true } },
-      bar: { horizontal: true, borderRadius: 4, colors: { ranges: [{ from: 0, to: 100, color: '#2962FF' }] } }
+      bar: { horizontal: false, borderRadius: 4, colors: { ranges: [{ from: 0, to: 100, color: '#2962FF' }] } }
     },
     tooltip: { theme: 'dark' }
   };
@@ -138,7 +138,7 @@ export default function Dashboard() {
               onClick={() => setGraphType('bar')}
               className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'bar' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-4"/></svg> Horizontal
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-4"/></svg> Bar
             </button>
           </div>
         </div>
