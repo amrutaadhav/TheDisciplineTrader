@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 
 const capitalSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  startingAmount: { type: Number, required: true },
-  currentBalance: { type: Number, default: 0 },
-  liquidity: { type: Number, default: 0 },
-  buffer: { type: Number, default: 0 },
-  withdrawals: { type: Number, default: 0 },
-  growth: { type: Number, default: 0 }
+  userId: { type: String, required: true, unique: true },
+  startingAmount: { type: Number, default: 10000 },
+  liquidAmount:   { type: Number, default: 10000 },
+  bufferAmount:   { type: Number, default: 1500 },
+  withdrawAmount: { type: Number, default: 0 },
+  growthAmount:   { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Capital', capitalSchema);

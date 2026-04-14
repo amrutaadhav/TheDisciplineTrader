@@ -1,25 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const Capital = require('../models/Capital');
+const Streak = require('../models/Streak');
 
+// Get streak by userId
 router.get('/:userId', async (req, res) => {
   try {
-    let capital = await Capital.findOne({ userId: req.params.userId });
-    if (!capital) capital = await Capital.create({ userId: req.params.userId });
-    res.json(capital);
+    let streak = await Streak.findOne({ userId: req.params.userId });
+    if (!streak) {
+      streak = await Streak.create({ userId: req.params.userId });
+    }
+    res.json(streak);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
+// Update streak for userId
 router.put('/:userId', async (req, res) => {
   try {
-    const capital = await Capital.findOneAndUpdate(
+    const streak = await Streak.findOneAndUpdate(
       { userId: req.params.userId },
       req.body,
       { new: true, upsert: true }
     );
-    res.json(capital);
+    res.json(streak);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

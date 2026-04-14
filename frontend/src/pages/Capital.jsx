@@ -1,40 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
+import { useAuth } from '../context/AuthContext';
+
+const API = 'http://localhost:5000/api';
 
 export default function Capital() {
-  const [capital, setCapital] = useState(() => {
-    const saved = localStorage.getItem('disciplineTrader_capital');
-    if (saved) return JSON.parse(saved);
-    return {
-      startingAmount: 10000,
-      liquidAmount: 8500,
-      bufferAmount: 1500,
-      withdrawAmount: 500,
-      growthAmount: 500
-    };
-  });
+  const { user } = useAuth();
+  const userId = user?._id || user?.email || 'default';
 
-  const [formData, setFormData] = useState(capital);
+  const defaultCapital = {
+    startingAmount: 10000,
+    liquidAmount: 8500,
+    bufferAmount: 1500,
+    withdrawAmount: 500,
+    growthAmount: 500
+  };
+
+  const [capital, setCapital] = useState(defaultCapital);
+  const [formData, setFormData] = useState(defaultCapital);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem('disciplineTrader_capital', JSON.stringify(capital));
-  }, [capital]);
+    fetch(`${API}/capital/${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        const { startingAmount, liquidAmount, bufferAmount, withdrawAmount, growthAmount } = data;
+        const loaded = { startingAmount, liquidAmount, bufferAmount, withdrawAmount, growthAmount };
+        setCapital(loaded);
+        setFormData(loaded);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [userId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: Number(e.target.value) || 0 });
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
+    await fetch(`${API}/capital/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
     setCapital(formData);
     setIsEditing(false);
   };
 
   const chartOptions = {
-    chart: { 
-      background: '#121212',
-      fontFamily: 'Inter, sans-serif'
-    },
+    chart: { background: '#121212', fontFamily: 'Inter, sans-serif' },
     theme: { mode: 'dark' },
     labels: ['Liquid Funds', 'Buffer Vault', 'Withdrawn', 'Growth'],
     colors: ['#2962FF', '#26A69A', '#EF5350', '#E2B714'],
@@ -45,11 +60,13 @@ export default function Capital() {
   };
 
   const series = [
-    capital.liquidAmount,
-    capital.bufferAmount,
-    capital.withdrawAmount,
+    capital.liquidAmount || 0,
+    capital.bufferAmount || 0,
+    capital.withdrawAmount || 0,
     capital.growthAmount > 0 ? capital.growthAmount : 0
   ];
+
+  if (loading) return <div className="flex items-center justify-center h-48 text-[#787B86]">Loading Bankroll...</div>;
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
@@ -61,8 +78,6 @@ export default function Capital() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
-        
-        {/* Treasury Metrics Table */}
         <div className="bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-xl overflow-hidden flex flex-col">
           <div className="border-b border-[#2B2B43] p-6 flex justify-between items-center bg-[#1E222D]/50">
             <h3 className="text-xl font-bold text-[#D1D4DC]">Treasury Metrics</h3>
@@ -75,7 +90,7 @@ export default function Capital() {
               </div>
             )}
           </div>
-          
+
           <div className="p-6 flex-1 flex flex-col gap-5">
             {[
               { label: 'Starting Amount', key: 'startingAmount', desc: 'Initial deposit capital.', color: 'text-white' },
@@ -92,51 +107,37 @@ export default function Capital() {
                 {isEditing ? (
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#787B86]">$</span>
-                    <input 
-                      type="number" 
-                      name={field.key}
-                      value={formData[field.key]} 
-                      onChange={handleChange}
-                      className="bg-[#1E222D] p-2 pl-7 rounded-lg border border-[#2B2B43] focus:border-[#2962FF] text-white focus:outline-none transition-colors w-32 text-right font-mono"
-                    />
+                    <input type="number" name={field.key} value={formData[field.key]} onChange={handleChange}
+                      className="bg-[#1E222D] p-2 pl-7 rounded-lg border border-[#2B2B43] focus:border-[#2962FF] text-white focus:outline-none transition-colors w-32 text-right font-mono"/>
                   </div>
                 ) : (
                   <span className={`text-xl font-bold font-mono tracking-tight ${field.color}`}>
-                    ${capital[field.key].toLocaleString()}
+                    ${(capital[field.key] || 0).toLocaleString()}
                   </span>
                 )}
               </div>
             ))}
           </div>
-          
+
           <div className="bg-[#1E222D]/30 p-4 border-t border-[#2B2B43] flex items-center justify-between">
             <span className="text-sm font-medium text-[#787B86]">Total Equity Check</span>
             <span className="font-mono text-lg text-white font-black bg-[#2B2B43]/50 px-3 py-1 rounded">
-              ${(capital.liquidAmount + capital.bufferAmount).toLocaleString()}
+              ${((capital.liquidAmount || 0) + (capital.bufferAmount || 0)).toLocaleString()}
             </span>
           </div>
         </div>
 
-        {/* Capital Allocation Graph */}
         <div className="bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-xl flex flex-col p-6">
           <h3 className="text-xl font-bold text-[#D1D4DC] mb-2">Capital Allocation</h3>
           <p className="text-[#787B86] text-sm mb-8">Visual distribution of your active and vaulted funds.</p>
-          
           <div className="flex-1 flex items-center justify-center min-h-[300px]">
-             {series.every(val => val === 0) ? (
-               <p className="text-[#787B86] italic">No capital allocated to visualize.</p>
-             ) : (
-               <Chart 
-                 options={chartOptions} 
-                 series={series} 
-                 type="donut" 
-                 width="100%" 
-                 height="350"
-               />
-             )}
+            {series.every(val => val === 0) ? (
+              <p className="text-[#787B86] italic">No capital allocated to visualize.</p>
+            ) : (
+              <Chart options={chartOptions} series={series} type="donut" width="100%" height="350" />
+            )}
           </div>
         </div>
-
       </div>
     </div>
   );

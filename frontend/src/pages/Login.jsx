@@ -39,34 +39,24 @@ export default function Login() {
       }
     }
 
-    // Store credentials in LocalStorage (mock backend)
     if (mode === 'signup') {
-      const existing = localStorage.getItem(`dt_user_${formData.email}`);
-      if (existing) {
-        setError('An account with this email already exists.');
-        setLoading(false);
-        return;
-      }
-      localStorage.setItem(`dt_user_${formData.email}`, JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      }));
-      login({ name: formData.name, email: formData.email });
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password })
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.message || 'Registration failed.'); setLoading(false); return; }
+      login({ name: data.name, email: data.email, token: data.token, _id: data._id });
     } else {
-      const saved = localStorage.getItem(`dt_user_${formData.email}`);
-      if (!saved) {
-        setError('No account found with this email.');
-        setLoading(false);
-        return;
-      }
-      const storedUser = JSON.parse(saved);
-      if (storedUser.password !== formData.password) {
-        setError('Incorrect password.');
-        setLoading(false);
-        return;
-      }
-      login({ name: storedUser.name, email: storedUser.email });
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password })
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.message || 'Login failed.'); setLoading(false); return; }
+      login({ name: data.name, email: data.email, token: data.token, _id: data._id });
     }
 
     setLoading(false);

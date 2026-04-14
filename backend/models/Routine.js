@@ -1,15 +1,12 @@
 const mongoose = require('mongoose');
 
-const routineSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  date: { type: Date, required: true },
-  studyHours: { type: Number, default: 0 },
-  gym: { type: Boolean, default: false },
-  dietPlan: { type: Boolean, default: false },
-  sleepHours: { type: Number, default: 0 },
-  dailyLearning: { type: Boolean, default: false },
-  mindGames: { type: Boolean, default: false },
-  meditation: { type: Boolean, default: false }
+const routineHistorySchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  date:   { type: String, required: true }, // YYYY-MM-DD
+  score:  { type: Number, default: 0 },
+  tasks:  { type: mongoose.Schema.Types.Mixed, default: [] }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Routine', routineSchema);
+routineHistorySchema.index({ userId: 1, date: 1 }, { unique: true });
+
+module.exports = mongoose.model('RoutineHistory', routineHistorySchema);

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const StreakContext = createContext(null);
+const API = 'http://localhost:5000/api';
 
 function getTodayStr() {
   return new Date().toISOString().split('T')[0];
@@ -24,59 +26,43 @@ const BADGES = [
 ];
 
 export function StreakProvider({ children }) {
-  const [streakData, setStreakData] = useState(() => {
-    const saved = localStorage.getItem('disciplineTrader_streak');
-    if (saved) return JSON.parse(saved);
-    return {
-      currentStreak: 0,
-      longestStreak: 0,
-      lastActiveDate: null,
-      totalActiveDays: 0,
-      earnedBadges: [],
-      history: [], // array of date strings
-    };
+  const { user } = useAuth();
+  const userId = user?._id || user?.email || 'default';
+
+  const [streakData, setStreakData] = useState({
+    currentStreak: 0, longestStreak: 0, lastActiveDate: null, totalActiveDays: 0, earnedBadges: [], history: []
   });
 
-  // On mount, check if we need to update today's streak
   useEffect(() => {
+    if (!userId) return;
     const today = getTodayStr();
     const yesterday = getYesterdayStr();
 
-    setStreakData(prev => {
-      let updated = { ...prev };
-      const alreadyLoggedToday = prev.history.includes(today);
+    fetch(`${API}/streak/${userId}`)
+      .then(r => r.json())
+      .then(prev => {
+        const alreadyLoggedToday = (prev.history || []).includes(today);
+        let updated = { ...prev };
 
-      if (!alreadyLoggedToday) {
-        // Extend or reset streak
-        let newStreak = 1;
-        if (prev.lastActiveDate === yesterday) {
-          newStreak = prev.currentStreak + 1;
-        } else if (prev.lastActiveDate === today) {
-          newStreak = prev.currentStreak;
+        if (!alreadyLoggedToday) {
+          let newStreak = 1;
+          if (prev.lastActiveDate === yesterday) newStreak = (prev.currentStreak || 0) + 1;
+          const newHistory = [...(prev.history || []), today];
+          const newLongest = Math.max(prev.longestStreak || 0, newStreak);
+          const newBadges = BADGES.filter(b => newStreak >= b.streak).map(b => b.id);
+          updated = { ...prev, currentStreak: newStreak, longestStreak: newLongest, lastActiveDate: today, totalActiveDays: (prev.totalActiveDays || 0) + 1, earnedBadges: newBadges, history: newHistory };
+
+          fetch(`${API}/streak/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+          }).catch(() => {});
         }
 
-        const newHistory = [...(prev.history || []), today];
-        const newLongest = Math.max(prev.longestStreak || 0, newStreak);
-
-        // Determine earned badges
-        const newBadges = BADGES.filter(b => newStreak >= b.streak).map(b => b.id);
-
-        updated = {
-          ...prev,
-          currentStreak: newStreak,
-          longestStreak: newLongest,
-          lastActiveDate: today,
-          totalActiveDays: (prev.totalActiveDays || 0) + 1,
-          earnedBadges: newBadges,
-          history: newHistory,
-        };
-
-        localStorage.setItem('disciplineTrader_streak', JSON.stringify(updated));
-      }
-
-      return updated;
-    });
-  }, []);
+        setStreakData(updated);
+      })
+      .catch(() => {});
+  }, [userId]);
 
   const persistStreak = (updated) => {
     setStreakData(updated);
