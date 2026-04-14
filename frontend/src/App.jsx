@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import Routine from './pages/Routine';
+import Capital from './pages/Capital';
 import MindGames from './pages/MindGames';
 
 function App() {
@@ -16,9 +17,10 @@ function App() {
           </div>
           <nav className="flex flex-col gap-3 font-medium">
             <Link to="/" className="p-3 rounded-xl hover:bg-[#333] hover:text-white transition-all text-gray-300 flex items-center gap-3"><span className="text-xl">📊</span>Dashboard</Link>
-            <Link to="/journal" className="p-3 rounded-xl hover:bg-[#333] hover:text-white transition-all text-gray-300 flex items-center gap-3"><span className="text-xl">📓</span>Journal</Link>
-            <Link to="/routine" className="p-3 rounded-xl hover:bg-[#333] hover:text-white transition-all text-gray-300 flex items-center gap-3"><span className="text-xl">✅</span>Routine</Link>
-            <Link to="/mindgames" className="p-3 rounded-xl hover:bg-[#333] hover:text-white transition-all text-gray-300 flex items-center gap-3"><span className="text-xl">🧠</span>Mind Games</Link>
+            <Link to="/journal" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">📓</span>Journal</Link>
+            <Link to="/routine" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">✅</span>Routine</Link>
+            <Link to="/capital" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">💰</span>Bankroll</Link>
+            <Link to="/mindgames" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🧠</span>Mind Games</Link>
           </nav>
         </aside>
 
@@ -36,6 +38,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/routine" element={<Routine />} />
+              <Route path="/capital" element={<Capital />} />
               <Route path="/mindgames" element={<MindGames />} />
             </Routes>
           </div>
