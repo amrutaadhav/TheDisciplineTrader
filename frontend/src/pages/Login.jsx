@@ -65,7 +65,7 @@ export default function Login() {
   return (
     <div className="min-h-screen w-full bg-[#0E0E0E] flex items-center justify-center relative overflow-hidden">
       {/* Atmospheric Background Logo */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.06] pointer-events-none overflow-hidden select-none">
         <img 
           src="/logo.png" 
           alt="" 

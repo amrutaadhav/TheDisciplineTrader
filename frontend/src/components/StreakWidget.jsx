@@ -35,11 +35,15 @@ export default function StreakWidget() {
 
       {/* Popup Panel */}
       {showPopup && (
-        <div
-          className="absolute right-0 top-12 w-80 bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-2xl z-50 overflow-hidden"
-          onMouseEnter={() => setShowPopup(true)}
-          onMouseLeave={() => setShowPopup(false)}
-        >
+        <>
+          {/* Mobile Overlay */}
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden" onClick={() => setShowPopup(false)} />
+          
+          <div
+            className="fixed md:absolute right-4 md:right-0 top-20 md:top-12 left-4 md:left-auto w-auto md:w-80 bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200"
+            onMouseEnter={() => setShowPopup(true)}
+            onMouseLeave={() => setShowPopup(false)}
+          >
           {/* Header */}
           <div className="bg-gradient-to-r from-orange-500/20 to-red-500/10 border-b border-[#2B2B43] p-5">
             <div className="flex items-center justify-between mb-3">
