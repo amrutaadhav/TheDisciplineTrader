@@ -72,9 +72,11 @@ export default function Videos() {
           <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Videos</h2>
           <p className="text-[#787B86] mt-1">Curated educational content for your mental edge and mastery.</p>
         </div>
-        <button onClick={() => setShowAddForm(!showAddForm)} className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl shadow-lg transition-all font-bold">
-          {showAddForm ? 'Cancel' : '+ Add Video'}
-        </button>
+        {user?.role === 'admin' && (
+          <button onClick={() => setShowAddForm(!showAddForm)} className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl shadow-lg transition-all font-bold">
+            {showAddForm ? 'Cancel' : '+ Add Video'}
+          </button>
+        )}
       </div>
 
       {showAddForm && (
@@ -126,7 +128,9 @@ export default function Videos() {
               <h3 className="text-white font-bold text-lg mb-1 leading-tight group-hover:text-purple-400 transition-colors">{video.title}</h3>
               <div className="flex justify-between items-center pt-3 border-t border-[#2B2B43]">
                 <a href={video.url} target="_blank" rel="noreferrer" className="text-sm text-[#787B86] hover:text-white transition-colors">Study Now ↗</a>
-                <button onClick={() => deleteVideo(video._id)} className="text-[#EF5350] hover:bg-[#EF5350]/10 p-2 rounded-lg transition-colors text-sm font-semibold">Remove</button>
+                {user?.role === 'admin' && (
+                  <button onClick={() => deleteVideo(video._id)} className="text-[#EF5350] hover:bg-[#EF5350]/10 p-2 rounded-lg transition-colors text-sm font-semibold">Remove</button>
+                )}
               </div>
             </div>
           </div>

@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   points: { type: Number, default: 0 },
   disciplineScore: { type: Number, default: 100 },
-  streakCount: { type: Number, default: 0 }
+  streakCount: { type: Number, default: 0 },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
 
 userSchema.pre('save', async function(next) {
