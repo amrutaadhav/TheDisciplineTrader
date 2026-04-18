@@ -60,13 +60,13 @@ function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-darkBg text-white w-full overflow-hidden font-sans relative">
+    <div className="flex flex-col md:flex-row h-screen bg-[#0E0E0E] text-white w-full overflow-hidden font-sans relative">
       {/* Global Atmospheric Background Logo */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.12] pointer-events-none overflow-hidden select-none z-0">
+      <div className="fixed inset-0 flex items-center justify-center opacity-[0.10] pointer-events-none overflow-hidden select-none z-0">
         <img 
           src="/logo.png" 
           alt="" 
-          className="w-[120%] max-w-none grayscale scale-150 transform rotate-12"
+          className="w-[120%] md:w-[80%] max-w-none scale-150 transform rotate-12"
         />
       </div>
       {/* Sidebar */}

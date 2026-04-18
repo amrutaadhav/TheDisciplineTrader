@@ -69,7 +69,7 @@ export default function Capital() {
   if (loading) return <div className="flex items-center justify-center h-48 text-[#787B86]">Loading Bankroll...</div>;
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
+    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8">
       <div className="flex justify-between items-end border-b border-[#2B2B43] pb-4">
         <div>
           <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>

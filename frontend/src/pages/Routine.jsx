@@ -131,7 +131,7 @@ export default function Routine() {
   const series = graphType === 'area' ? [{ name: 'Daily Compliance', data: lineData }] : [{ name: 'Compliance Action', data: candleData }];
 
   return (
-    <div className="flex flex-col gap-8 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
+    <div className="flex flex-col gap-8 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8">
       
       <div className="flex flex-col lg:flex-row gap-8">
         

@@ -89,7 +89,7 @@ export default function Dashboard() {
           ]}];
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8 animate-fade-in bg-[#0E0E0E] min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8 pb-10">
+    <div className="flex flex-col gap-6 md:gap-8 animate-fade-in bg-transparent min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8 pb-10">
       
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         <Link to="/journal" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#EF5350]/50 transition-colors cursor-pointer group">
