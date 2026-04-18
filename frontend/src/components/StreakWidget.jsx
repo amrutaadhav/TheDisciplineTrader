@@ -141,7 +141,8 @@ export default function StreakWidget() {
             </div>
           </div>
         </div>
-      )}
+      </>
+    )}
     </div>
   );
 }
