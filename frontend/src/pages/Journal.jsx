@@ -20,7 +20,7 @@ export default function Journal() {
   const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/trades')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`)
       .then(res => res.json())
       .then(data => {
          if(Array.isArray(data)) {
@@ -150,7 +150,7 @@ export default function Journal() {
     };
     
     if (editTradeId) {
-      fetch(`http://localhost:5000/api/trades/${editTradeId}`, {
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades/${editTradeId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tradeData)
@@ -159,7 +159,7 @@ export default function Journal() {
         cancelEdit();
       });
     } else {
-      fetch('http://localhost:5000/api/trades', {
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tradeData)
@@ -171,7 +171,7 @@ export default function Journal() {
   };
 
   const deleteTrade = (id) => {
-    fetch(`http://localhost:5000/api/trades/${id}`, { method: 'DELETE' })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades/${id}`, { method: 'DELETE' })
       .then(() => setTrades(trades.filter(t => t.id !== id)));
   };
 

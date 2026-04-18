@@ -60,34 +60,35 @@ function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="flex h-screen bg-darkBg text-white w-full overflow-hidden font-sans">
+    <div className="flex flex-col md:flex-row h-screen bg-darkBg text-white w-full overflow-hidden font-sans">
       {/* Sidebar */}
-      <aside className="w-64 bg-darkCard border-r border-[#333] flex flex-col p-4 shadow-xl z-10 transition-all duration-300">
-        <div className="flex items-center gap-3 mb-8 mt-2 px-2">
-          <img src="/logo.png" alt="The Discipline Trader Logo" className="w-9 h-9 rounded-xl shadow-[0_0_12px_rgba(41,98,255,0.4)] object-cover" />
-          <h1 className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2962FF] to-cyan-400 tracking-wide leading-tight">The Discipline<br/>Trader</h1>
+      <aside className="w-full md:w-64 bg-darkCard border-b md:border-b-0 md:border-r border-[#333] flex flex-col p-4 shadow-xl z-20 transition-all duration-300 md:h-full shrink-0">
+        <div className="flex items-center justify-between md:justify-start gap-3 mb-2 md:mb-8 md:mt-2 px-2">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="The Discipline Trader Logo" className="w-9 h-9 rounded-xl shadow-[0_0_12px_rgba(41,98,255,0.4)] object-cover" />
+            <h1 className="text-base md:text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2962FF] to-cyan-400 tracking-wide leading-tight">The Discipline<br className="hidden md:block"/>Trader</h1>
+          </div>
         </div>
-        <nav className="flex flex-col gap-3 font-medium">
-          <Link to="/" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">📊</span>Dashboard</Link>
-          <Link to="/journal" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">📓</span>Journal</Link>
-          <Link to="/routine" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">✅</span>Routine</Link>
-          <Link to="/capital" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">💰</span>Bankroll</Link>
-          <Link to="/videos" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🎬</span>Videos</Link>
-          <Link to="/mindgames" className="p-3 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-3"><span className="text-xl">🧠</span>Mind Games</Link>
+        <nav className="flex md:flex-col gap-2 md:gap-3 font-medium overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
+          <Link to="/" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">📊</span><span className="md:inline">Dashboard</span></Link>
+          <Link to="/journal" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">📓</span><span className="md:inline">Journal</span></Link>
+          <Link to="/routine" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">✅</span><span className="md:inline">Routine</span></Link>
+          <Link to="/capital" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">💰</span><span className="md:inline">Bankroll</span></Link>
+          <Link to="/videos" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">🎬</span><span className="md:inline">Videos</span></Link>
+          <Link to="/mindgames" className="p-2 md:p-3 whitespace-nowrap shrink-0 rounded-xl hover:bg-[#1E222D] hover:text-white transition-all text-[#D1D4DC] flex items-center gap-2 md:gap-3 text-sm md:text-base"><span className="text-xl">🧠</span><span className="md:inline">Mind Games</span></Link>
         </nav>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto w-full relative">
-        <header className="h-16 border-b border-[#333] flex items-center justify-between px-8 bg-darkBg/90 backdrop-blur top-0 sticky z-10">
-          <h2 className="text-lg font-semibold text-gray-200">Welcome back, {user?.name?.split(' ')[0] || 'Trader'} 👋</h2>
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/30">Score: 100</span>
+        <header className="h-auto md:h-16 py-3 md:py-0 border-b border-[#333] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 bg-darkBg/90 backdrop-blur top-0 sticky z-10 gap-3 md:gap-0">
+          <h2 className="text-base md:text-lg font-semibold text-gray-200 truncate w-full md:w-auto text-center md:text-left">Welcome back, {user?.name?.split(' ')[0] || 'Trader'} 👋</h2>
+          <div className="flex items-center justify-center md:justify-end gap-3 md:gap-4 w-full md:w-auto">
             <StreakWidget />
             <ProfileMenu />
           </div>
         </header>
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/journal" element={<Journal />} />
