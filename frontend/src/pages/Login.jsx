@@ -47,7 +47,7 @@ export default function Login() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message || 'Registration failed.'); setLoading(false); return; }
-      login({ name: data.name, email: data.email, token: data.token, _id: data._id });
+      login({ name: data.name, email: data.email, token: data.token, _id: data._id, role: data.role });
     } else {
       const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/login`, {
         method: 'POST',
@@ -56,7 +56,7 @@ export default function Login() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message || 'Login failed.'); setLoading(false); return; }
-      login({ name: data.name, email: data.email, token: data.token, _id: data._id });
+      login({ name: data.name, email: data.email, token: data.token, _id: data._id, role: data.role });
     }
 
     setLoading(false);
