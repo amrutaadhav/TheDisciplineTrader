@@ -89,7 +89,7 @@ function AppLayout() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto w-full relative">
-        <header className="h-auto md:h-16 py-3 md:py-0 border-b border-[#333] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 bg-darkBg/90 backdrop-blur top-0 sticky z-10 gap-3 md:gap-0">
+        <header className="h-auto md:h-16 py-3 md:py-0 border-b border-[#333] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 bg-darkBg/90 backdrop-blur relative md:sticky top-0 z-10 gap-3 md:gap-0">
           <h2 className="text-base md:text-lg font-semibold text-gray-200 truncate w-full md:w-auto text-center md:text-left">Welcome back, {user?.name?.split(' ')[0] || 'Trader'} 👋</h2>
           <div className="flex items-center justify-center md:justify-end gap-3 md:gap-4 w-full md:w-auto">
             <StreakWidget />
