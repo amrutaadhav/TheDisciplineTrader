@@ -64,6 +64,15 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full bg-[#0E0E0E] flex items-center justify-center relative overflow-hidden">
+      {/* Atmospheric Background Logo */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden">
+        <img 
+          src="/logo.png" 
+          alt="" 
+          className="w-[120%] max-w-none grayscale scale-150 transform rotate-12"
+        />
+      </div>
+
       {/* Background decorative blobs */}
       <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-[#2962FF]/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2 pointer-events-none" />
