@@ -69,11 +69,11 @@ export default function Capital() {
   if (loading) return <div className="flex items-center justify-center h-48 text-[#787B86]">Loading Bankroll...</div>;
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
-      <div className="flex justify-between items-end border-b border-[#2B2B43] pb-4">
+    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-[#2B2B43] pb-4 gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>
-          <p className="text-[#787B86] mt-1">Manage your liquidity, buffers, and growth targets safely.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>
+          <p className="text-xs md:text-sm text-[#787B86] mt-1">Manage your liquidity, buffers, and growth targets safely.</p>
         </div>
       </div>
 
@@ -134,7 +134,7 @@ export default function Capital() {
             {series.every(val => val === 0) ? (
               <p className="text-[#787B86] italic">No capital allocated to visualize.</p>
             ) : (
-              <Chart options={chartOptions} series={series} type="donut" width="100%" height="350" />
+              <Chart options={chartOptions} series={series} type="donut" width="100%" height={window.innerWidth < 768 ? 280 : 350} />
             )}
           </div>
         </div>
