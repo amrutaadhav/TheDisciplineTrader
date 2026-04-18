@@ -9,21 +9,26 @@ async function createAdmin() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    const adminEmail = 'admin@disciplinetrader.com';
+    const adminEmail = 'mrutajspm02@gmail.com';
     const existing = await User.findOne({ email: adminEmail });
     
     if (existing) {
       existing.role = 'admin';
+      // If user wants specific password, we should update it if it's the admin setup script's job
+      // but usually we just want to promote the existing user to admin.
+      // However, the user specifically gave a password too.
+      // Note: User.js has a pre-save hook for hashing.
+      existing.password = 'Amruta@123'; 
       await existing.save();
-      console.log('Admin role updated for:', adminEmail);
+      console.log('Admin role and password updated for:', adminEmail);
     } else {
       await User.create({
-        name: 'Super Admin',
+        name: 'The Discipline Trader Admin',
         email: adminEmail,
-        password: 'AdminPassword123!',
+        password: 'Amruta@123',
         role: 'admin'
       });
-      console.log('New Admin User created');
+      console.log('New Admin User created with requested credentials');
     }
     
     process.exit(0);
