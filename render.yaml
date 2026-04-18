@@ -1,0 +1,29 @@
+services:
+  # Backend
+  - type: web
+    name: discipline-trader-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false # Render will ask you for this value
+      - key: JWT_SECRET
+        generateValue: true # Render will create a secret one for you
+
+  # Frontend
+  - type: static
+    name: discipline-trader-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: discipline-trader-backend
+          property: url
