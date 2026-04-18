@@ -257,8 +257,10 @@ export default function Journal() {
               </div>
             </div>
             
-            <div className="w-full relative flex-1 min-h-[350px]">
-              <Chart options={chartOptions} series={series} type={graphType === 'area' ? 'area' : 'candlestick'} height="100%" width="100%" />
+            <div className="w-full relative flex-1 min-h-[350px] overflow-x-auto overflow-y-auto custom-scrollbar">
+              <div className="min-w-[600px] md:min-w-0 h-full">
+                <Chart options={chartOptions} series={series} type={graphType === 'area' ? 'area' : 'candlestick'} height="100%" width="100%" />
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-4">

@@ -120,43 +120,45 @@ export default function Dashboard() {
       </div>
 
       {/* Main Global Graph Section */}
-      <div className="bg-[#131722] border border-[#2B2B43] p-4 md:p-6 rounded-2xl shadow-xl flex flex-col h-[400px] md:h-[500px]">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div className="bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-xl flex flex-col h-[500px]">
+        <div className="flex justify-between items-center mb-6">
           <div className="flex flex-col">
-             <h3 className="text-lg md:text-xl font-bold text-[#D1D4DC]">Ecosystem Global Growth</h3>
-             <p className="text-xs md:text-sm text-[#787B86]">Unified timeline of your holistic scores.</p>
+             <h3 className="text-xl font-bold text-[#D1D4DC]">Ecosystem Global Growth</h3>
+             <p className="text-sm text-[#787B86]">Unified timeline of your holistic discipline and equity scores.</p>
           </div>
           
-          <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43] w-full sm:w-auto">
+          <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43]">
             <button 
               onClick={() => setGraphType('area')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center justify-center gap-1 ${graphType === 'area' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'area' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M7 14l5-5 4 4 5-5"/></svg> Line
             </button>
             <button 
               onClick={() => setGraphType('candlestick')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center justify-center gap-1 ${graphType === 'candlestick' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'candlestick' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 4v16"/><path d="M15 4v16"/><path d="M7 8h4v8H7zm6-2h4v12h-4z"/></svg> Candles
             </button>
             <button 
               onClick={() => setGraphType('bar')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center justify-center gap-1 ${graphType === 'bar' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'bar' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-4"/></svg> Bar
             </button>
           </div>
         </div>
         
-        <div className="w-full relative flex-1">
-          <Chart 
-            options={chartOptions} 
-            series={series} 
-            type={graphType === 'area' ? 'area' : graphType === 'candlestick' ? 'candlestick' : 'bar'} 
-            height="100%" 
-            width="100%" 
-          />
+        <div className="w-full relative flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
+          <div className="min-w-[600px] md:min-w-0 h-full">
+            <Chart 
+              options={chartOptions} 
+              series={series} 
+              type={graphType === 'area' ? 'area' : graphType === 'candlestick' ? 'candlestick' : 'bar'} 
+              height="100%" 
+              width="100%" 
+            />
+          </div>
         </div>
       </div>
 

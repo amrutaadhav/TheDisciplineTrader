@@ -69,11 +69,11 @@ export default function Capital() {
   if (loading) return <div className="flex items-center justify-center h-48 text-[#787B86]">Loading Bankroll...</div>;
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-[#2B2B43] pb-4 gap-4">
+    <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-[#0E0E0E] min-h-screen px-4 -m-8 pt-8">
+      <div className="flex justify-between items-end border-b border-[#2B2B43] pb-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>
-          <p className="text-xs md:text-sm text-[#787B86] mt-1">Manage your liquidity, buffers, and growth targets safely.</p>
+          <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>
+          <p className="text-[#787B86] mt-1">Manage your liquidity, buffers, and growth targets safely.</p>
         </div>
       </div>
 
@@ -130,12 +130,14 @@ export default function Capital() {
         <div className="bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-xl flex flex-col p-6">
           <h3 className="text-xl font-bold text-[#D1D4DC] mb-2">Capital Allocation</h3>
           <p className="text-[#787B86] text-sm mb-8">Visual distribution of your active and vaulted funds.</p>
-          <div className="flex-1 flex items-center justify-center min-h-[300px]">
-            {series.every(val => val === 0) ? (
-              <p className="text-[#787B86] italic">No capital allocated to visualize.</p>
-            ) : (
-              <Chart options={chartOptions} series={series} type="donut" width="100%" height={window.innerWidth < 768 ? 280 : 350} />
-            )}
+          <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar flex items-center justify-center">
+            <div className="min-w-[350px] md:min-w-0">
+              {series.every(val => val === 0) ? (
+                <p className="text-[#787B86] italic">No capital allocated to visualize.</p>
+              ) : (
+                <Chart options={chartOptions} series={series} type="donut" width="100%" height="350" />
+              )}
+            </div>
           </div>
         </div>
       </div>
