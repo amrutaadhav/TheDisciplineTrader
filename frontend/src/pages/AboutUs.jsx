@@ -17,11 +17,11 @@ export default function AboutUs() {
         <div className="bg-[#131722]/80 backdrop-blur-md border border-[#2B2B43] rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center transform transition-transform hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(41,98,255,0.15)] relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#2962FF] to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
           
-          <div className="w-32 h-32 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
+          <div className="w-40 h-40 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
             <img 
               src="/images/amruta.jpeg" 
               alt="Amruta Adhav" 
-              className="w-full h-full object-cover bg-[#1E222D]"
+              className="w-full h-full object-cover object-top bg-[#1E222D]"
               onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Amruta+Adhav&background=2962FF&color=fff&size=200"; }}
             />
           </div>
@@ -37,11 +37,11 @@ export default function AboutUs() {
         <div className="bg-[#131722]/80 backdrop-blur-md border border-[#2B2B43] rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center transform transition-transform hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(38,166,154,0.15)] relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#26A69A] to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
           
-          <div className="w-32 h-32 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
+          <div className="w-40 h-40 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
             <img 
               src="/images/dhiraj.jpeg" 
               alt="Dhiraj Adhav" 
-              className="w-full h-full object-cover bg-[#1E222D]"
+              className="w-full h-full object-cover object-top bg-[#1E222D]"
               onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Dhiraj+Adhav&background=26A69A&color=fff&size=200"; }}
             />
           </div>
