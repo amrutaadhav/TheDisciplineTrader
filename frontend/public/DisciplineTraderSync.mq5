@@ -8,8 +8,8 @@
 #property version   "1.00"
 
 //--- Input Parameters
-input string SecretSyncKey = "Paste_Key_Here";
-input string BackendURL = "http://localhost:5000/api/mt5/sync";
+input string SecretSyncKey ="DT-JTZAC5UTA";
+input string BackendURL = "https://discipline-trader-backend.onrender.com/api/mt5/sync";
 input bool   SyncPastHistoryOnStartup = true;
 input int    MaxHistoryTradesToSync = 50;
 
