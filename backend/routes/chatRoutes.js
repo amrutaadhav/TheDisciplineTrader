@@ -5,12 +5,15 @@ const { OpenAI } = require('openai');
 router.post('/', async (req, res) => {
   const { messages } = req.body;
   
-  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
-    return res.status(500).json({ error: 'OpenAI API key is missing. Please add it to your .env file.' });
+  if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'your_groq_api_key_here') {
+    return res.status(500).json({ error: 'Groq API key is missing. Please add it to your .env file.' });
   }
 
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ 
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1'
+    });
     
     const systemPrompt = {
       role: 'system',
@@ -38,7 +41,7 @@ router.post('/', async (req, res) => {
     const apiMessages = [systemPrompt, ...formattedMessages];
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'llama-3.2-11b-vision-preview',
       messages: apiMessages,
       max_tokens: 500,
     });
