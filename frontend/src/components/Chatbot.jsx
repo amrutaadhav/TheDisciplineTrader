@@ -16,12 +16,26 @@ export default function Chatbot() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
-  const playVoice = (text) => {
+  const [playingIndex, setPlayingIndex] = useState(null);
+
+  const toggleVoice = (text, index) => {
     if (!window.speechSynthesis) return alert('Your browser does not support text-to-speech.');
+    
+    if (playingIndex === index) {
+      window.speechSynthesis.cancel();
+      setPlayingIndex(null);
+      return;
+    }
+
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
+    
+    utterance.onend = () => setPlayingIndex(null);
+    utterance.onerror = () => setPlayingIndex(null);
+    
+    setPlayingIndex(index);
     window.speechSynthesis.speak(utterance);
   };
 
@@ -102,7 +116,7 @@ export default function Chatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[90vw] md:w-[400px] h-[550px] max-h-[80vh] bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden animate-slide-up">
+        <div className="fixed bottom-20 md:bottom-24 right-4 md:right-6 w-[calc(100vw-2rem)] md:w-[400px] h-[550px] max-h-[80vh] bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden animate-slide-up">
           {/* Header */}
           <div className="bg-[#1E222D] p-4 border-b border-[#2B2B43] flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -123,11 +137,15 @@ export default function Chatbot() {
                   <p className="whitespace-pre-wrap pr-6">{msg.content}</p>
                   {msg.role === 'assistant' && (
                     <button 
-                      onClick={() => playVoice(msg.content)} 
-                      className="absolute top-2 right-2 text-[#787B86] hover:text-[#2962FF] opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Listen to message"
+                      onClick={() => toggleVoice(msg.content, i)} 
+                      className={`absolute top-2 right-2 hover:text-[#2962FF] transition-opacity ${playingIndex === i ? 'opacity-100 text-[#2962FF]' : 'text-[#787B86] opacity-0 group-hover:opacity-100'}`}
+                      title={playingIndex === i ? "Stop playback" : "Listen to message"}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                      {playingIndex === i ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                      )}
                     </button>
                   )}
                 </div>
