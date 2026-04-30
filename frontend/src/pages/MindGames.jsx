@@ -4,6 +4,7 @@ export default function MindGames() {
   const [timeLeft, setTimeLeft] = useState(1200); // 20 minutes in seconds
   const [isActive, setIsActive] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     let interval = null;
@@ -11,9 +12,10 @@ export default function MindGames() {
       interval = setInterval(() => {
         setTimeLeft((time) => time - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && isActive) {
       setIsActive(false);
       setCompleted(true);
+      setShowPopup(true);
       clearInterval(interval);
     } else {
       clearInterval(interval);
@@ -44,6 +46,23 @@ export default function MindGames() {
 
   return (
     <div className="flex flex-col gap-8 animate-fade-in max-w-5xl mx-auto pb-10">
+      {/* Session Complete Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-[#1E222D] border border-[#2B2B43] p-8 rounded-3xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(168,85,247,0.2)]">
+            <div className="text-7xl mb-4 animate-bounce">🏆</div>
+            <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-wide">Great Job!</h3>
+            <p className="text-[#787B86] mb-8 leading-relaxed">Your 20-minute mind game session is complete. Your trading edge is now sharper.</p>
+            <button 
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity uppercase tracking-widest"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Mind Games</h2>
