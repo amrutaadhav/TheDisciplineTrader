@@ -245,7 +245,7 @@ export default function Dashboard() {
 
       {/* Main Global Graph Section */}
       <div className="bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-xl flex flex-col h-[500px]">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="flex flex-col">
              <h3 className="text-xl font-bold text-[#D1D4DC]">Ecosystem Global Growth</h3>
              <p className="text-sm text-[#787B86]">Unified timeline of your holistic discipline and equity scores.</p>

@@ -180,13 +180,13 @@ export default function Routine() {
         {/* Right Side: Graph Analytics */}
         <div className="lg:w-2/3">
           <div className="bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-xl flex flex-col h-full min-h-[500px]">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div className="flex gap-4 items-center">
                 <h3 className="text-lg font-bold text-[#D1D4DC]">Consistency Chart</h3>
                 <span className="bg-[#1E222D] text-[#787B86] text-xs px-2 py-1 rounded font-mono border border-[#2B2B43]">1D</span>
               </div>
               
-              <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43]">
+              <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43] w-full md:w-auto justify-between md:justify-start">
                 <button 
                   onClick={() => setGraphType('area')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'area' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}

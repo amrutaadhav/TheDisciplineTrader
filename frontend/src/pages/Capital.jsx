@@ -70,16 +70,16 @@ export default function Capital() {
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8">
-      <div className="flex justify-between items-end border-b border-[#2B2B43] pb-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#2B2B43] pb-4 gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A]">Bankroll & Capital Planner</h2>
+          <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-[#26A69A] leading-tight">Bankroll & Capital Planner</h2>
           <p className="text-[#787B86] mt-1">Manage your liquidity, buffers, and growth targets safely.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
         <div className="bg-[#131722] border border-[#2B2B43] rounded-2xl shadow-xl overflow-hidden flex flex-col">
-          <div className="border-b border-[#2B2B43] p-6 flex justify-between items-center bg-[#1E222D]/50">
+          <div className="border-b border-[#2B2B43] p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#1E222D]/50">
             <h3 className="text-xl font-bold text-[#D1D4DC]">Treasury Metrics</h3>
             {!isEditing ? (
               <button onClick={() => setIsEditing(true)} className="text-[#2962FF] hover:text-white px-4 py-1.5 rounded-lg border border-[#2962FF]/30 transition-all font-medium text-sm">Update Funds</button>

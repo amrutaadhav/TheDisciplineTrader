@@ -33,6 +33,7 @@ export default function Journal() {
   const [formData, setFormData] = useState({ pair: '', setup: '', entry: '', exit: '', rr: '', pl: '', notes: '' });
   const [rules, setRules] = useState(initialRules);
   const [warningMessage, setWarningMessage] = useState('');
+  const [visibleTradesCount, setVisibleTradesCount] = useState(5);
 
   const toggleRule = (key) => setRules(prev => ({ ...prev, [key]: { ...prev[key], checked: !prev[key].checked } }));
 
@@ -177,12 +178,12 @@ export default function Journal() {
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8">
-      <div className="flex justify-between items-end border-b border-[#2B2B43] pb-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[#2B2B43] pb-4">
         <div>
           <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#2962FF] to-cyan-400">Trading Journal</h2>
           <p className="text-[#787B86] mt-1">Review your actions, learn from patterns.</p>
         </div>
-        <button onClick={() => showAdd ? cancelEdit() : setShowAdd(true)} className={`transition-all px-6 py-2 rounded-xl font-bold shadow-lg ${showAdd ? 'bg-[#EF5350]/20 text-[#EF5350] border border-[#EF5350]/50' : 'bg-[#2962FF] hover:bg-[#2962FF]/80 text-white shadow-[#2962FF]/20'}`}>
+        <button onClick={() => showAdd ? cancelEdit() : setShowAdd(true)} className={`w-full md:w-auto transition-all px-6 py-2 rounded-xl font-bold shadow-lg ${showAdd ? 'bg-[#EF5350]/20 text-[#EF5350] border border-[#EF5350]/50' : 'bg-[#2962FF] hover:bg-[#2962FF]/80 text-white shadow-[#2962FF]/20'}`}>
           {showAdd ? 'Cancel' : '+ New Trade'}
         </button>
       </div>
@@ -236,12 +237,12 @@ export default function Journal() {
       {!showAdd && (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in-up">
           <div className="lg:col-span-3 bg-[#131722] border border-[#2B2B43] p-6 rounded-2xl shadow-xl flex flex-col">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div className="flex gap-4 items-center">
                 <h3 className="text-lg font-bold text-[#D1D4DC]">Equity Chart</h3>
                 <span className="bg-[#1E222D] text-[#787B86] text-xs px-2 py-1 rounded font-mono border border-[#2B2B43]">1D</span>
               </div>
-              <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43]">
+              <div className="flex bg-[#1E222D] p-1 rounded-lg border border-[#2B2B43] w-full md:w-auto justify-between md:justify-start">
                 <button 
                   onClick={() => setGraphType('area')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded transition-all flex items-center gap-1 ${graphType === 'area' ? 'bg-[#2B2B43] text-white shadow' : 'text-[#787B86] hover:text-[#D1D4DC]'}`}
@@ -303,7 +304,7 @@ export default function Journal() {
             <tbody>
               {trades.length === 0 ? (
                 <tr><td colSpan="8" className="text-center p-8 text-[#787B86]">No positions logged.</td></tr>
-              ) : trades.map((trade) => (
+              ) : trades.slice(0, visibleTradesCount).map((trade) => (
                 <tr key={trade.id} className="border-b border-[#2A2E39] hover:bg-[#1E222D] transition-colors font-mono text-sm">
                   <td className="p-4 pl-6 text-[#D1D4DC]">{trade.date}</td>
                   <td className="p-4 font-bold text-[#D1D4DC]">{trade.pair}</td>
@@ -340,6 +341,16 @@ export default function Journal() {
             </tbody>
           </table>
         </div>
+        {trades.length > visibleTradesCount && (
+          <div className="p-4 border-t border-[#2B2B43] flex justify-center">
+            <button 
+              onClick={() => setVisibleTradesCount(prev => prev + 5)}
+              className="text-[#2962FF] font-bold text-sm hover:underline"
+            >
+              See More Positions ({trades.length - visibleTradesCount} hidden)
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
