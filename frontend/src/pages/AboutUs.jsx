@@ -41,7 +41,7 @@ export default function AboutUs() {
             <img 
               src="/images/dhiraj.jpeg" 
               alt="Dhiraj Adhav" 
-              className="w-full h-full object-cover object-top bg-[#1E222D]"
+              className="w-full h-full object-cover object-center bg-[#1E222D]"
               onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Dhiraj+Adhav&background=26A69A&color=fff&size=200"; }}
             />
           </div>
