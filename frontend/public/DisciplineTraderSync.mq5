@@ -71,7 +71,8 @@ void SyncPastHistory()
      {
       char post[], result[];
       string headers;
-      StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8);
+      int len = StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8);
+      ArrayResize(post, len - 1);
       string custom_headers = "Content-Type: application/json\r\n";
       
       int res = WebRequest("POST", BackendURL, custom_headers, 10000, post, result, headers);
@@ -117,7 +118,8 @@ void SendTradeToWebsite(string pair, double entry, double pl)
                  "\"pl\":\"" + DoubleToString(pl, 2) + "\"," +
                  "\"setup\":\"MT5 Webhook Auto-Sync\"}";
                  
-   StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8);
+   int len = StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8);
+   ArrayResize(post, len - 1);
    string custom_headers = "Content-Type: application/json\r\n";
    
    int res = WebRequest("POST", BackendURL, custom_headers, 5000, post, result, headers);
