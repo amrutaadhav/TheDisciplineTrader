@@ -16,6 +16,15 @@ export default function Chatbot() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
+  const playVoice = (text) => {
+    if (!window.speechSynthesis) return alert('Your browser does not support text-to-speech.');
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -109,9 +118,18 @@ export default function Chatbot() {
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] rounded-2xl p-3 text-sm ${msg.role === 'user' ? 'bg-[#2962FF] text-white rounded-br-sm' : 'bg-[#1E222D] text-[#D1D4DC] rounded-bl-sm border border-[#2B2B43]'}`}>
+                <div className={`max-w-[80%] rounded-2xl p-3 text-sm relative group ${msg.role === 'user' ? 'bg-[#2962FF] text-white rounded-br-sm' : 'bg-[#1E222D] text-[#D1D4DC] rounded-bl-sm border border-[#2B2B43]'}`}>
                   {msg.image && <img src={msg.image} alt="Upload" className="w-full rounded-xl mb-2" />}
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap pr-6">{msg.content}</p>
+                  {msg.role === 'assistant' && (
+                    <button 
+                      onClick={() => playVoice(msg.content)} 
+                      className="absolute top-2 right-2 text-[#787B86] hover:text-[#2962FF] opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Listen to message"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
