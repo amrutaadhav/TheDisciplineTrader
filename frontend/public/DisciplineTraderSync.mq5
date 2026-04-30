@@ -10,6 +10,8 @@
 //--- Input Parameters
 input string SecretSyncKey = "Paste_Key_Here";
 input string BackendURL = "http://localhost:5000/api/mt5/sync";
+input bool   SyncPastHistoryOnStartup = true;
+input int    MaxHistoryTradesToSync = 50;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -17,11 +19,71 @@ input string BackendURL = "http://localhost:5000/api/mt5/sync";
 int OnInit()
   {
    Print("Discipline Trader Sync EA Initialized. Key: ", SecretSyncKey);
+   
+   if(SyncPastHistoryOnStartup)
+     {
+      SyncPastHistory();
+     }
+     
    return(INIT_SUCCEEDED);
   }
 
 //+------------------------------------------------------------------+
-//| TradeTransaction function                                        |
+//| Bulk Sync Past History Function                                  |
+//+------------------------------------------------------------------+
+void SyncPastHistory()
+  {
+   HistorySelect(0, TimeCurrent());
+   int total = HistoryDealsTotal();
+   int count = 0;
+   
+   string json = "{\"syncKey\":\"" + SecretSyncKey + "\", \"trades\":[";
+   
+   for(int i = total - 1; i >= 0; i--)
+     {
+      ulong ticket = HistoryDealGetTicket(i);
+      if(ticket > 0)
+        {
+         long type = HistoryDealGetInteger(ticket, DEAL_TYPE);
+         double profit = HistoryDealGetDouble(ticket, DEAL_PROFIT);
+         
+         if((type == DEAL_TYPE_BUY || type == DEAL_TYPE_SELL) && profit != 0)
+           {
+            string symbol = HistoryDealGetString(ticket, DEAL_SYMBOL);
+            double entry = HistoryDealGetDouble(ticket, DEAL_PRICE);
+            
+            if(count > 0) json += ",";
+            
+            json += "{" +
+                    "\"pair\":\"" + symbol + "\"," +
+                    "\"entry\":\"" + DoubleToString(entry, 5) + "\"," +
+                    "\"pl\":\"" + DoubleToString(profit, 2) + "\"}";
+            
+            count++;
+            if(count >= MaxHistoryTradesToSync) break;
+           }
+        }
+     }
+     
+   json += "]}";
+   
+   if(count > 0)
+     {
+      char post[], result[];
+      string headers;
+      StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8);
+      string custom_headers = "Content-Type: application/json\r\n";
+      
+      int res = WebRequest("POST", BackendURL, custom_headers, 10000, post, result, headers);
+      if(res == 200)
+         Print("Successfully bulk-synced ", count, " past trades to the Dashboard!");
+      else
+         Print("Failed to bulk sync history. Error code: ", GetLastError(), " WebRequest Code: ", res);
+     }
+  }
+
+//+------------------------------------------------------------------+
+//| TradeTransaction function (Real-time sync)                       |
 //+------------------------------------------------------------------+
 void OnTradeTransaction(const MqlTradeTransaction& trans, const MqlTradeRequest& request, const MqlTradeResult& result)
   {

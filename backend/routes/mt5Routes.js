@@ -6,17 +6,32 @@ const Trade = require('../models/Trade');
 // @desc    Receive trade data from MT5 EA Webhook
 router.post('/sync', async (req, res) => {
   try {
-    const { syncKey, pair, setup, entry, exit, rr, pl, notes } = req.body;
+    const { syncKey, pair, setup, entry, exit, rr, pl, notes, trades } = req.body;
 
     // Basic security check: Validate sync key exists
     if (!syncKey || !syncKey.startsWith('DT-')) {
       return res.status(401).json({ error: 'Unauthorized: Invalid Secret Sync Key' });
     }
 
-    // In a fully developed app, you would look up the user by the syncKey
-    // const user = await User.findOne({ mt5SyncKey: syncKey });
-    // Since this is a standalone demo, we will just save the trade
+    // Handle Bulk History Sync
+    if (trades && Array.isArray(trades)) {
+      const formattedTrades = trades.map(t => ({
+        pair: t.pair || 'UNKNOWN',
+        setup: t.setup || 'MT5 History Sync',
+        entry: t.entry || '0.0',
+        exit: t.exit || '0.0',
+        rr: t.rr || '1:1',
+        pl: t.pl || '0',
+        notes: t.notes || 'Synced from MT5 Past History',
+        rulesViolated: []
+      }));
+      
+      await Trade.insertMany(formattedTrades);
+      console.log(`[MT5 WEBHOOK] Bulk synced ${trades.length} historical trades for key: ${syncKey}`);
+      return res.json({ success: true, count: trades.length });
+    }
 
+    // Handle Single Trade (Real-time)
     const newTrade = new Trade({
       pair: pair || 'UNKNOWN',
       setup: setup || 'MT5 Auto-Sync',
@@ -29,7 +44,7 @@ router.post('/sync', async (req, res) => {
     });
 
     const trade = await newTrade.save();
-    console.log(`[MT5 WEBHOOK] Trade synced successfully for key: ${syncKey}`);
+    console.log(`[MT5 WEBHOOK] Real-time trade synced successfully for key: ${syncKey}`);
     
     res.json({ success: true, trade });
   } catch (err) {
