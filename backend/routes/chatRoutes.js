@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
     const apiMessages = [systemPrompt, ...formattedMessages];
 
     const response = await openai.chat.completions.create({
-      model: 'llama-3.2-11b-vision-preview',
+      model: 'llama-3.3-70b-versatile',
       messages: apiMessages,
       max_tokens: 500,
     });
