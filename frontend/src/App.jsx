@@ -10,7 +10,7 @@ import Capital from './pages/Capital';
 import Videos from './pages/Videos';
 import MindGames from './pages/MindGames';
 import Login from './pages/Login';
-
+import Chatbot from './components/Chatbot';
 function ProfileMenu() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
@@ -106,6 +106,9 @@ function AppLayout() {
             <Route path="/mindgames" element={<MindGames />} />
           </Routes>
         </div>
+        
+        {/* Global Chatbot */}
+        <Chatbot />
       </main>
     </div>
   );
