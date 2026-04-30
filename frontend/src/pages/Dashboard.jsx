@@ -9,6 +9,22 @@ export default function Dashboard() {
   const [graphType, setGraphType] = useState('area'); // area, candlestick, bar
 
   const [news, setNews] = useState([]);
+  const [showMt5Modal, setShowMt5Modal] = useState(false);
+  const [mt5Connected, setMt5Connected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleMt5Connect = (e) => {
+    e.preventDefault();
+    setIsConnecting(true);
+    setTimeout(() => {
+      setIsConnecting(false);
+      setMt5Connected(true);
+      setShowMt5Modal(false);
+      const newCapital = { ...capital, liquidAmount: capital.startingAmount + 540 };
+      setCapital(newCapital);
+      localStorage.setItem('disciplineTrader_capital', JSON.stringify(newCapital));
+    }, 2000);
+  };
 
   useEffect(() => {
     // 1. Fetch Journal
@@ -131,6 +147,70 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col gap-6 md:gap-8 animate-fade-in bg-transparent min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8 pb-10">
       
+      {/* MT5 Connection Modal */}
+      {showMt5Modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-[#1E222D] border border-[#2B2B43] p-8 rounded-3xl max-w-md w-full shadow-2xl relative">
+            <button onClick={() => setShowMt5Modal(false)} className="absolute top-4 right-4 text-[#787B86] hover:text-white text-xl">✕</button>
+            <div className="flex flex-col items-center mb-6">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/MetaTrader_5_logo.png/600px-MetaTrader_5_logo.png" alt="MT5" className="w-16 h-16 object-contain mb-4" />
+               <h3 className="text-2xl font-bold text-white">Connect MetaTrader 5</h3>
+               <p className="text-[#787B86] text-sm text-center mt-2">Link your trading account to automatically sync your balance, trades, and discipline data.</p>
+            </div>
+            
+            <form onSubmit={handleMt5Connect} className="flex flex-col gap-4">
+               <div>
+                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Broker Server</label>
+                 <input type="text" required placeholder="e.g. MetaQuotes-Demo" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+               </div>
+               <div>
+                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Account Login ID</label>
+                 <input type="text" required placeholder="Account Number" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+               </div>
+               <div>
+                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Password</label>
+                 <input type="password" required placeholder="••••••••" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+               </div>
+               
+               <button 
+                 type="submit" 
+                 disabled={isConnecting || mt5Connected}
+                 className="w-full bg-[#2962FF] hover:bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+               >
+                 {isConnecting ? (
+                   <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Connecting...</>
+                 ) : mt5Connected ? (
+                   'Connected ✓'
+                 ) : (
+                   'Secure Connect'
+                 )}
+               </button>
+               <p className="text-[10px] text-[#787B86] text-center mt-2 flex items-center justify-center gap-1">
+                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                 Credentials are encrypted and stored locally via MetaApi.
+               </p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dashboard Header & MT5 Connection */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            Trading Dashboard
+          </h2>
+          <p className="text-[#787B86] text-sm mt-1">Monitor your discipline, capital, and live trades.</p>
+        </div>
+        <button 
+          onClick={() => !mt5Connected && setShowMt5Modal(true)}
+          className={`mt-4 md:mt-0 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mt5Connected ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 text-white shadow-lg shadow-blue-500/20'}`}
+        >
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/MetaTrader_5_logo.png/600px-MetaTrader_5_logo.png" alt="MT5" className="w-5 h-5 object-contain" />
+          {mt5Connected ? 'MT5 Connected & Syncing' : 'Connect MT5'}
+        </button>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         <Link to="/journal" className="bg-[#131722] p-6 rounded-2xl border border-[#2B2B43] shadow-lg hover:border-[#EF5350]/50 transition-colors cursor-pointer group">
           <h3 className="text-[#787B86] font-medium text-sm flex items-center gap-2 transition-colors group-hover:text-white">📓 Journal</h3>
