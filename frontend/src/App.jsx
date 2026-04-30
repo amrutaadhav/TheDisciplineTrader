@@ -111,15 +111,15 @@ function AppLayout() {
         
         {/* Meaningful Footer */}
         <footer className="mt-auto py-6 border-t border-[#2B2B43] bg-[#0A0E17]/80 backdrop-blur flex flex-col md:flex-row items-center justify-between px-4 md:px-8">
-          <p className="text-[#787B86] text-sm italic text-center md:text-left mb-3 md:mb-0">
+          <p className="text-[#787B86] text-xs sm:text-sm italic text-center md:text-left mb-4 md:mb-0 max-w-sm md:max-w-none">
             "Discipline is the bridge between goals and accomplishment. Protect your capital, respect your rules."
           </p>
-          <div className="flex items-center gap-6">
-            <Link to="/about" className="text-[#D1D4DC] hover:text-[#2962FF] text-sm font-semibold transition-colors">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <Link to="/about" className="text-[#D1D4DC] hover:text-[#2962FF] text-xs sm:text-sm font-semibold transition-colors">
               About Us
             </Link>
-            <span className="text-[#2B2B43]">|</span>
-            <span className="text-[#787B86] text-xs">© {new Date().getFullYear()} The Discipline Trader</span>
+            <span className="text-[#2B2B43] hidden sm:inline">|</span>
+            <span className="text-[#787B86] text-[10px] sm:text-xs text-center">© {new Date().getFullYear()} The Discipline Trader</span>
           </div>
         </footer>
 
