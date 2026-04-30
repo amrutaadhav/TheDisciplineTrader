@@ -153,7 +153,9 @@ export default function Dashboard() {
           <div className="bg-[#1E222D] border border-[#2B2B43] p-8 rounded-3xl max-w-md w-full shadow-2xl relative">
             <button onClick={() => setShowMt5Modal(false)} className="absolute top-4 right-4 text-[#787B86] hover:text-white text-xl">✕</button>
             <div className="flex flex-col items-center mb-6">
-               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/MetaTrader_5_logo.png/600px-MetaTrader_5_logo.png" alt="MT5" className="w-16 h-16 object-contain mb-4" />
+               <div className="w-16 h-16 bg-gradient-to-br from-[#00A1E0] to-[#0074A6] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
+                 <span className="text-white font-black text-2xl italic tracking-tighter">MT5</span>
+               </div>
                <h3 className="text-2xl font-bold text-white">Connect MetaTrader 5</h3>
                <p className="text-[#787B86] text-sm text-center mt-2">Link your trading account to automatically sync your balance, trades, and discipline data.</p>
             </div>
@@ -206,7 +208,9 @@ export default function Dashboard() {
           onClick={() => !mt5Connected && setShowMt5Modal(true)}
           className={`mt-4 md:mt-0 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mt5Connected ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 text-white shadow-lg shadow-blue-500/20'}`}
         >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/MetaTrader_5_logo.png/600px-MetaTrader_5_logo.png" alt="MT5" className="w-5 h-5 object-contain" />
+          <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center">
+             <span className="text-white font-black text-[10px] italic tracking-tighter">MT5</span>
+          </div>
           {mt5Connected ? 'MT5 Connected & Syncing' : 'Connect MT5'}
         </button>
       </div>
