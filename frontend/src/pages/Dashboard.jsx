@@ -11,6 +11,8 @@ export default function Dashboard() {
   const [news, setNews] = useState([]);
   const [showMt5Modal, setShowMt5Modal] = useState(false);
   const [syncKey, setSyncKey] = useState('');
+  const [mt5Connected, setMt5Connected] = useState(false);
+  const [showOvertradeAlert, setShowOvertradeAlert] = useState(false);
 
   useEffect(() => {
     const savedKey = localStorage.getItem('disciplineTrader_syncKey');
