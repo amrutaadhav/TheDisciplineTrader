@@ -46,11 +46,9 @@ export default function Dashboard() {
   };
 
   const handleMt5Disconnect = () => {
-    if (window.confirm("Are you sure you want to disable MT5 Sync and remove your key?")) {
-      setMt5Connected(false);
-      localStorage.removeItem('disciplineTrader_syncKey');
-      setSyncKey('DT-' + Math.random().toString(36).substr(2, 9).toUpperCase());
-    }
+    setMt5Connected(false);
+    localStorage.removeItem('disciplineTrader_syncKey');
+    setSyncKey('DT-' + Math.random().toString(36).substr(2, 9).toUpperCase());
   };
 
   useEffect(() => {
