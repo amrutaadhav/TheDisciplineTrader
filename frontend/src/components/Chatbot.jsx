@@ -4,9 +4,21 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
+  const defaultMessages = [
     { role: 'assistant', content: "Hello! I am your AI Trading Mentor. You can ask me questions, upload a chart, or even use your voice to talk to me!" }
-  ]);
+  ];
+  
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('disciplineTrader_chat_history');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { return defaultMessages; }
+    }
+    return defaultMessages;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('disciplineTrader_chat_history', JSON.stringify(messages));
+  }, [messages]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [image, setImage] = useState(null);
@@ -123,9 +135,16 @@ export default function Chatbot() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">AI</div>
               <div>
                 <h3 className="text-white font-bold text-sm">Trading Mentor AI</h3>
-                <p className="text-[#787B86] text-xs">GPT-4o Vision Enabled</p>
+                <p className="text-[#787B86] text-xs">Groq Vision Enabled</p>
               </div>
             </div>
+            <button 
+              onClick={() => { setMessages(defaultMessages); localStorage.removeItem('disciplineTrader_chat_history'); }}
+              className="text-[#787B86] hover:text-[#EF5350] p-2 transition-colors"
+              title="Clear Chat History"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
           </div>
 
           {/* Messages */}
