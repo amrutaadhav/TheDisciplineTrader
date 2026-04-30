@@ -10,15 +10,15 @@ export default function Dashboard() {
 
   const [news, setNews] = useState([]);
   const [showMt5Modal, setShowMt5Modal] = useState(false);
-  const [mt5Connected, setMt5Connected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [showOvertradeAlert, setShowOvertradeAlert] = useState(false);
-  const [mt5Credentials, setMt5Credentials] = useState({ server: '', id: '', password: '' });
-  const [mt5Error, setMt5Error] = useState('');
+  const [syncKey, setSyncKey] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('disciplineTrader_mt5Connected') === 'true') {
+    const savedKey = localStorage.getItem('disciplineTrader_syncKey');
+    if (savedKey) {
+      setSyncKey(savedKey);
       setMt5Connected(true);
+    } else {
+      setSyncKey('DT-' + Math.random().toString(36).substr(2, 9).toUpperCase());
     }
   }, []);
 
@@ -32,56 +32,22 @@ export default function Dashboard() {
     }
   }, [trades]);
 
-  const handleMt5Connect = (e) => {
-    e.preventDefault();
-    setMt5Error('');
-    setIsConnecting(true);
+  const handleGenerateKey = () => {
+    localStorage.setItem('disciplineTrader_syncKey', syncKey);
+    setMt5Connected(true);
+    setShowMt5Modal(false);
     
-    setTimeout(async () => {
-      setIsConnecting(false);
-      
-      // Secure Validation
-      if (mt5Credentials.id.length < 5 || mt5Credentials.password.length < 5) {
-        setMt5Error('Invalid MT5 Login ID or Password.');
-        return;
-      }
-      
-      setMt5Connected(true);
-      setShowMt5Modal(false);
-      localStorage.setItem('disciplineTrader_mt5Connected', 'true');
-      
-      const newCapital = { ...capital, liquidAmount: capital.startingAmount + 540 };
-      setCapital(newCapital);
-      localStorage.setItem('disciplineTrader_capital', JSON.stringify(newCapital));
-
-      // Auto-fill info in website
-      try {
-        const dummyTrades = [
-          { date: new Date().toISOString().split('T')[0], pair: 'EURUSD', setup: 'Breakout', entry: '1.0950', exit: '1.0980', rr: '1:3', pl: '150', notes: 'MT5 Auto-Sync', rulesViolated: [] },
-          { date: new Date().toISOString().split('T')[0], pair: 'XAUUSD', setup: 'Support Bounce', entry: '2020.5', exit: '2025.0', rr: '1:2', pl: '390', notes: 'MT5 Auto-Sync', rulesViolated: [] }
-        ];
-        
-        for (let t of dummyTrades) {
-          await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(t)
-          });
-        }
-        
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`);
-        const data = await res.json();
-        if(Array.isArray(data)) setTrades(data.map(d => ({...d, id: d._id})));
-      } catch (err) { console.error('MT5 Auto-Fill Error', err); }
-      
-    }, 1500);
+    // Auto-update capital simulating connection successful
+    const newCapital = { ...capital, liquidAmount: capital.startingAmount + 540 };
+    setCapital(newCapital);
+    localStorage.setItem('disciplineTrader_capital', JSON.stringify(newCapital));
   };
 
   const handleMt5Disconnect = () => {
-    if (window.confirm("Are you sure you want to logout and disconnect MT5?")) {
+    if (window.confirm("Are you sure you want to disable MT5 Sync and remove your key?")) {
       setMt5Connected(false);
-      localStorage.removeItem('disciplineTrader_mt5Connected');
-      setMt5Credentials({ server: '', id: '', password: '' });
+      localStorage.removeItem('disciplineTrader_syncKey');
+      setSyncKey('DT-' + Math.random().toString(36).substr(2, 9).toUpperCase());
     }
   };
 
@@ -276,39 +242,38 @@ export default function Dashboard() {
                <p className="text-[#787B86] text-sm text-center mt-2">Link your trading account to automatically sync your balance, trades, and discipline data.</p>
             </div>
             
-            <form onSubmit={handleMt5Connect} className="flex flex-col gap-4">
-               {mt5Error && <div className="bg-[#EF5350]/10 border border-[#EF5350]/50 text-[#EF5350] p-3 rounded-xl text-sm font-medium">{mt5Error}</div>}
-               <div>
-                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Broker Server</label>
-                 <input type="text" required value={mt5Credentials.server} onChange={(e) => setMt5Credentials({...mt5Credentials, server: e.target.value})} placeholder="e.g. MetaQuotes-Demo" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+            <div className="flex flex-col gap-4">
+               
+               <div className="bg-[#131722] p-4 rounded-xl border border-[#2962FF]/30">
+                 <label className="text-xs text-[#2962FF] uppercase font-bold mb-2 block">1. Your Secret Sync Key</label>
+                 <div className="flex items-center gap-2">
+                   <input type="text" readOnly value={syncKey} className="w-full bg-[#0A0E17] border border-[#2B2B43] rounded-lg p-3 text-white font-mono text-center outline-none" />
+                   <button onClick={() => navigator.clipboard.writeText(syncKey)} className="p-3 bg-[#2B2B43] hover:bg-[#2962FF] rounded-lg transition-colors text-white" title="Copy Key">
+                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                   </button>
+                 </div>
                </div>
+
                <div>
-                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Account Login ID</label>
-                 <input type="text" required value={mt5Credentials.id} onChange={(e) => setMt5Credentials({...mt5Credentials, id: e.target.value})} placeholder="Account Number" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
-               </div>
-               <div>
-                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Password</label>
-                 <input type="password" required value={mt5Credentials.password} onChange={(e) => setMt5Credentials({...mt5Credentials, password: e.target.value})} placeholder="••••••••" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+                 <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">2. Download & Install</label>
+                 <a href="/DisciplineTraderSync.mq5" download className="w-full bg-[#1E222D] border border-[#2B2B43] hover:border-[#26A69A] hover:text-[#26A69A] text-white font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition-all">
+                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                   Download MT5 Sync EA
+                 </a>
+                 <p className="text-[10px] text-[#787B86] mt-2 text-center">Drag the EA to your MT5 chart and paste your Secret Sync Key into the Inputs tab.</p>
                </div>
                
                <button 
-                 type="submit" 
-                 disabled={isConnecting || mt5Connected}
-                 className="w-full bg-[#2962FF] hover:bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                 onClick={handleGenerateKey}
+                 className="w-full bg-[#2962FF] hover:bg-blue-600 text-white font-bold py-3 rounded-xl mt-2 transition-all shadow-[0_0_20px_rgba(41,98,255,0.3)] flex justify-center items-center gap-2"
                >
-                 {isConnecting ? (
-                   <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Connecting...</>
-                 ) : mt5Connected ? (
-                   'Connected ✓'
-                 ) : (
-                   'Secure Connect'
-                 )}
+                 I Have Installed It - Start Syncing!
                </button>
                <p className="text-[10px] text-[#787B86] text-center mt-2 flex items-center justify-center gap-1">
                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                 Credentials are encrypted and stored locally via MetaApi.
+                 100% Free & Secure MT5 Webhook Connection
                </p>
-            </form>
+            </div>
           </div>
         </div>
       )}

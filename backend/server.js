@@ -35,6 +35,7 @@ app.use('/api/routine', require('./routes/routineRoutes'));
 app.use('/api/videos',  require('./routes/videoRoutes'));
 app.use('/api/streak',  require('./routes/streakRoutes'));
 app.use('/api/chat',    require('./routes/chatRoutes'));
+app.use('/api/mt5',     require('./routes/mt5Routes'));
 
 // Connect to MongoDB with retry logic
 const connectDB = async () => {
