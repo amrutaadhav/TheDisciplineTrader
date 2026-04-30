@@ -19,7 +19,7 @@ export default function AboutUs() {
           
           <div className="w-32 h-32 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
             <img 
-              src="/images/amruta.jpg" 
+              src="/images/amruta.jpeg" 
               alt="Amruta Adhav" 
               className="w-full h-full object-cover bg-[#1E222D]"
               onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Amruta+Adhav&background=2962FF&color=fff&size=200"; }}
@@ -39,7 +39,7 @@ export default function AboutUs() {
           
           <div className="w-32 h-32 rounded-full border-4 border-[#1E222D] shadow-xl overflow-hidden mb-6 relative">
             <img 
-              src="/images/dhiraj.jpg" 
+              src="/images/dhiraj.jpeg" 
               alt="Dhiraj Adhav" 
               className="w-full h-full object-cover bg-[#1E222D]"
               onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Dhiraj+Adhav&background=26A69A&color=fff&size=200"; }}
