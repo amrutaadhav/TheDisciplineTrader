@@ -12,6 +12,17 @@ export default function Dashboard() {
   const [showMt5Modal, setShowMt5Modal] = useState(false);
   const [mt5Connected, setMt5Connected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showOvertradeAlert, setShowOvertradeAlert] = useState(false);
+
+  useEffect(() => {
+    if (trades.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const todaysTrades = trades.filter(t => t.date && t.date.startsWith(today));
+      if (todaysTrades.length > 8) {
+        setShowOvertradeAlert(true);
+      }
+    }
+  }, [trades]);
 
   const handleMt5Connect = (e) => {
     e.preventDefault();
@@ -183,6 +194,27 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col gap-6 md:gap-8 animate-fade-in bg-transparent min-h-screen px-4 -m-4 md:-m-8 pt-4 md:pt-8 pb-10">
       
+      {/* Overtrade Alert Popup */}
+      {showOvertradeAlert && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-[#1A1111] border-2 border-[#EF5350] p-6 md:p-10 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(239,83,80,0.4)] relative flex flex-col items-center text-center">
+            <div className="w-20 h-20 bg-[#EF5350]/20 rounded-full flex items-center justify-center mb-6">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#EF5350" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-[#EF5350] mb-4 tracking-tight uppercase">Overtrading Alert</h2>
+            <p className="text-[#D1D4DC] text-base md:text-lg mb-8 leading-relaxed">
+              Your MT5 sync shows you have taken <strong className="text-white">more than 8 trades</strong> today. This violates the core discipline rules. Step away from the charts immediately to protect your capital and psychology.
+            </p>
+            <button 
+              onClick={() => setShowOvertradeAlert(false)}
+              className="w-full py-4 bg-[#EF5350] hover:bg-red-600 text-white rounded-xl font-bold text-base md:text-lg uppercase tracking-widest transition-colors shadow-[0_0_20px_rgba(239,83,80,0.3)]"
+            >
+              I Understand, Closing Charts
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* MT5 Connection Modal */}
       {showMt5Modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
