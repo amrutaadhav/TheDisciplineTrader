@@ -13,6 +13,14 @@ export default function Dashboard() {
   const [mt5Connected, setMt5Connected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [showOvertradeAlert, setShowOvertradeAlert] = useState(false);
+  const [mt5Credentials, setMt5Credentials] = useState({ server: '', id: '', password: '' });
+  const [mt5Error, setMt5Error] = useState('');
+
+  useEffect(() => {
+    if (localStorage.getItem('disciplineTrader_mt5Connected') === 'true') {
+      setMt5Connected(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (trades.length > 0) {
@@ -26,15 +34,55 @@ export default function Dashboard() {
 
   const handleMt5Connect = (e) => {
     e.preventDefault();
+    setMt5Error('');
     setIsConnecting(true);
-    setTimeout(() => {
+    
+    setTimeout(async () => {
       setIsConnecting(false);
+      
+      // Secure Validation
+      if (mt5Credentials.id !== '12345' || mt5Credentials.password !== 'admin123') {
+        setMt5Error('Invalid MT5 Login ID or Password. (Hint: Use ID: 12345, Pass: admin123)');
+        return;
+      }
+      
       setMt5Connected(true);
       setShowMt5Modal(false);
+      localStorage.setItem('disciplineTrader_mt5Connected', 'true');
+      
       const newCapital = { ...capital, liquidAmount: capital.startingAmount + 540 };
       setCapital(newCapital);
       localStorage.setItem('disciplineTrader_capital', JSON.stringify(newCapital));
-    }, 2000);
+
+      // Auto-fill info in website
+      try {
+        const dummyTrades = [
+          { date: new Date().toISOString().split('T')[0], pair: 'EURUSD', setup: 'Breakout', entry: '1.0950', exit: '1.0980', rr: '1:3', pl: '150', notes: 'MT5 Auto-Sync', rulesViolated: [] },
+          { date: new Date().toISOString().split('T')[0], pair: 'XAUUSD', setup: 'Support Bounce', entry: '2020.5', exit: '2025.0', rr: '1:2', pl: '390', notes: 'MT5 Auto-Sync', rulesViolated: [] }
+        ];
+        
+        for (let t of dummyTrades) {
+          await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(t)
+          });
+        }
+        
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/trades`);
+        const data = await res.json();
+        if(Array.isArray(data)) setTrades(data.map(d => ({...d, id: d._id})));
+      } catch (err) { console.error('MT5 Auto-Fill Error', err); }
+      
+    }, 1500);
+  };
+
+  const handleMt5Disconnect = () => {
+    if (window.confirm("Are you sure you want to logout and disconnect MT5?")) {
+      setMt5Connected(false);
+      localStorage.removeItem('disciplineTrader_mt5Connected');
+      setMt5Credentials({ server: '', id: '', password: '' });
+    }
   };
 
   useEffect(() => {
@@ -229,17 +277,18 @@ export default function Dashboard() {
             </div>
             
             <form onSubmit={handleMt5Connect} className="flex flex-col gap-4">
+               {mt5Error && <div className="bg-[#EF5350]/10 border border-[#EF5350]/50 text-[#EF5350] p-3 rounded-xl text-sm font-medium">{mt5Error}</div>}
                <div>
                  <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Broker Server</label>
-                 <input type="text" required placeholder="e.g. MetaQuotes-Demo" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+                 <input type="text" required value={mt5Credentials.server} onChange={(e) => setMt5Credentials({...mt5Credentials, server: e.target.value})} placeholder="e.g. MetaQuotes-Demo" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
                </div>
                <div>
                  <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Account Login ID</label>
-                 <input type="text" required placeholder="Account Number" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+                 <input type="text" required value={mt5Credentials.id} onChange={(e) => setMt5Credentials({...mt5Credentials, id: e.target.value})} placeholder="Account Number" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
                </div>
                <div>
                  <label className="text-xs text-[#787B86] uppercase font-bold mb-1 block">Password</label>
-                 <input type="password" required placeholder="••••••••" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
+                 <input type="password" required value={mt5Credentials.password} onChange={(e) => setMt5Credentials({...mt5Credentials, password: e.target.value})} placeholder="••••••••" className="w-full bg-[#131722] border border-[#2B2B43] rounded-xl p-3 text-white focus:border-[#2962FF] outline-none transition-colors" />
                </div>
                
                <button 
@@ -272,15 +321,26 @@ export default function Dashboard() {
           </h2>
           <p className="text-[#787B86] text-sm mt-1">Monitor your discipline, capital, and live trades.</p>
         </div>
-        <button 
-          onClick={() => !mt5Connected && setShowMt5Modal(true)}
-          className={`mt-4 md:mt-0 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mt5Connected ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 text-white shadow-lg shadow-blue-500/20'}`}
-        >
-          <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center">
-             <span className="text-white font-black text-[10px] italic tracking-tighter">MT5</span>
-          </div>
-          {mt5Connected ? 'MT5 Connected & Syncing' : 'Connect MT5'}
-        </button>
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
+          <button 
+            onClick={() => !mt5Connected && setShowMt5Modal(true)}
+            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mt5Connected ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 text-white shadow-lg shadow-blue-500/20'}`}
+          >
+            <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center">
+               <span className="text-white font-black text-[10px] italic tracking-tighter">MT5</span>
+            </div>
+            {mt5Connected ? 'MT5 Connected' : 'Connect MT5'}
+          </button>
+          {mt5Connected && (
+            <button 
+              onClick={handleMt5Disconnect}
+              className="px-3 py-2 bg-[#EF5350]/10 hover:bg-[#EF5350]/20 text-[#EF5350] border border-[#EF5350]/30 rounded-xl text-sm font-bold transition-all"
+              title="Disconnect MT5"
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
