@@ -9,6 +9,7 @@ import Routine from './pages/Routine';
 import Capital from './pages/Capital';
 import Videos from './pages/Videos';
 import MindGames from './pages/MindGames';
+import AboutUs from './pages/AboutUs';
 import Login from './pages/Login';
 import Chatbot from './components/Chatbot';
 function ProfileMenu() {
@@ -104,9 +105,24 @@ function AppLayout() {
             <Route path="/capital" element={<Capital />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/mindgames" element={<MindGames />} />
+            <Route path="/about" element={<AboutUs />} />
           </Routes>
         </div>
         
+        {/* Meaningful Footer */}
+        <footer className="mt-auto py-6 border-t border-[#2B2B43] bg-[#0A0E17]/80 backdrop-blur flex flex-col md:flex-row items-center justify-between px-4 md:px-8">
+          <p className="text-[#787B86] text-sm italic text-center md:text-left mb-3 md:mb-0">
+            "Discipline is the bridge between goals and accomplishment. Protect your capital, respect your rules."
+          </p>
+          <div className="flex items-center gap-6">
+            <Link to="/about" className="text-[#D1D4DC] hover:text-[#2962FF] text-sm font-semibold transition-colors">
+              About Us
+            </Link>
+            <span className="text-[#2B2B43]">|</span>
+            <span className="text-[#787B86] text-xs">© {new Date().getFullYear()} The Discipline Trader</span>
+          </div>
+        </footer>
+
         {/* Global Chatbot */}
         <Chatbot />
       </main>
