@@ -41,8 +41,8 @@ export default function Dashboard() {
       setIsConnecting(false);
       
       // Secure Validation
-      if (mt5Credentials.id !== '12345' || mt5Credentials.password !== 'admin123') {
-        setMt5Error('Invalid MT5 Login ID or Password. (Hint: Use ID: 12345, Pass: admin123)');
+      if (mt5Credentials.id.length < 5 || mt5Credentials.password.length < 5) {
+        setMt5Error('Invalid MT5 Login ID or Password.');
         return;
       }
       
