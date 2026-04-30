@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     const apiMessages = [systemPrompt, ...formattedMessages];
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: apiMessages,
       max_tokens: 500,
     });
@@ -46,7 +46,8 @@ router.post('/', async (req, res) => {
     res.json(response.choices[0].message);
   } catch (error) {
     console.error('OpenAI Error:', error);
-    res.status(500).json({ error: 'Failed to communicate with the trading assistant.' });
+    const errorMessage = error.message || 'Failed to communicate with the trading assistant.';
+    res.status(500).json({ error: errorMessage });
   }
 });
 
