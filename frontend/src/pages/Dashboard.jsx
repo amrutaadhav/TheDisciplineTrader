@@ -90,24 +90,60 @@ export default function Dashboard() {
   
   const globalDisciplineScore = Math.round((journalCompliance + routineAvg + bankrollHealth + mindGamesScore + videoScore) / 5);
 
-  // Generate Global Timeline Data
+  const [globalHistory, setGlobalHistory] = useState(() => {
+    const saved = localStorage.getItem('disciplineTrader_global_history');
+    if (saved) return JSON.parse(saved);
+    return [
+      { date: '2026-04-26', score: 60 },
+      { date: '2026-04-27', score: 65 },
+      { date: '2026-04-28', score: 68 },
+      { date: '2026-04-29', score: 72 }
+    ];
+  });
+
+  const getTodayString = () => new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    if (globalDisciplineScore > 0) {
+      const todayStr = getTodayString();
+      const newHistory = [...globalHistory];
+      const todayIndex = newHistory.findIndex(h => h.date === todayStr);
+      
+      if (todayIndex >= 0) {
+        newHistory[todayIndex].score = globalDisciplineScore;
+      } else {
+        newHistory.push({ date: todayStr, score: globalDisciplineScore });
+      }
+      
+      if (JSON.stringify(newHistory) !== JSON.stringify(globalHistory)) {
+        setGlobalHistory(newHistory);
+        localStorage.setItem('disciplineTrader_global_history', JSON.stringify(newHistory));
+      }
+    }
+  }, [globalDisciplineScore, globalHistory]);
+
+  // Generate Global Timeline Data from Real History
   const generateTimelineData = () => {
     const candleData = [];
     const lineData = [];
     
-    // Simulate 7 days of global growth compounding all modules
-    let baseScore = globalDisciplineScore > 10 ? globalDisciplineScore - 15 : 50; 
-    const dates = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+    let lastScore = 50;
     
-    dates.forEach((date, i) => {
-      const open = i === 0 ? baseScore : Number(lineData[i-1].y);
-      const change = (Math.random() * 10) - (Math.random() * 4);
-      const close = i === 6 ? globalDisciplineScore : Math.min(100, open + change);
-      const high = Math.min(100, Math.max(open, close) + 3);
-      const low = Math.max(0, Math.min(open, close) - 3);
-
-      candleData.push({ x: date, y: [open.toFixed(1), high.toFixed(1), low.toFixed(1), close.toFixed(1)] });
-      lineData.push({ x: date, y: close.toFixed(1) });
+    globalHistory.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach((day, index) => {
+      const currentScore = day.score;
+      const open = index === 0 ? currentScore : lastScore;
+      const close = currentScore;
+      
+      const volatility = 2; 
+      const high = Math.min(100, Math.max(open, close) + volatility);
+      const low = Math.max(0, Math.min(open, close) - volatility);
+      
+      const displayDate = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      
+      candleData.push({ x: displayDate, y: [open.toFixed(1), high.toFixed(1), low.toFixed(1), close.toFixed(1)] });
+      lineData.push({ x: displayDate, y: close.toFixed(1) });
+      
+      lastScore = close;
     });
 
     return { candleData, lineData };
