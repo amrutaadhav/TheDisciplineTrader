@@ -55,8 +55,28 @@ export default function Routine() {
     localStorage.setItem('disciplineTrader_routine_history', JSON.stringify(newHistory));
   }, [todayTasks]);
 
+  const [isLocked, setIsLocked] = useState(() => {
+    return localStorage.getItem(`disciplineTrader_routine_lock_${getTodayString()}`) === 'true';
+  });
+  const [showLockPopup, setShowLockPopup] = useState(false);
+
   const toggleTask = (id) => {
+    if (isLocked) {
+      setShowLockPopup(true);
+      return;
+    }
     setTodayTasks(todayTasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  const handleLock = () => {
+    setIsLocked(true);
+    localStorage.setItem(`disciplineTrader_routine_lock_${getTodayString()}`, 'true');
+  };
+
+  const handleUnlock = () => {
+    setIsLocked(false);
+    localStorage.setItem(`disciplineTrader_routine_lock_${getTodayString()}`, 'false');
+    setShowLockPopup(false);
   };
 
   const progress = Math.round((todayTasks.filter(t => t.done).length / todayTasks.length) * 100);
@@ -131,7 +151,27 @@ export default function Routine() {
   const series = graphType === 'area' ? [{ name: 'Daily Compliance', data: lineData }] : [{ name: 'Compliance Action', data: candleData }];
 
   return (
-    <div className="flex flex-col gap-8 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8">
+    <div className="flex flex-col gap-8 animate-fade-in max-w-7xl mx-auto pb-10 bg-transparent min-h-screen px-4 -m-8 pt-8 relative">
+      
+      {/* Lock Popup Modal */}
+      {showLockPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-[#1E222D] border border-[#2B2B43] p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl relative">
+            <button onClick={() => setShowLockPopup(false)} className="absolute top-4 right-4 text-[#787B86] hover:text-white text-xl">✕</button>
+            <div className="text-5xl mb-4">🔒</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Routine Locked!</h3>
+            <p className="text-[#787B86] mb-6 text-sm">You have already locked your routine for today. Are you sure you want to unlock and edit it?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowLockPopup(false)} className="flex-1 bg-[#2B2B43] hover:bg-[#333] text-white font-bold py-3 rounded-xl transition-all">
+                Cancel
+              </button>
+              <button onClick={handleUnlock} className="flex-1 bg-[#EF5350] hover:bg-red-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg">
+                Unlock
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="flex flex-col lg:flex-row gap-8">
         
@@ -173,6 +213,16 @@ export default function Routine() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6">
+              <button 
+                onClick={handleLock}
+                disabled={isLocked}
+                className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest transition-all ${isLocked ? 'bg-[#2B2B43] text-[#787B86] cursor-not-allowed' : 'bg-[#2962FF] hover:bg-blue-600 text-white shadow-lg'}`}
+              >
+                {isLocked ? '🔒 Routine Locked for Today' : '✓ Lock Routine'}
+              </button>
             </div>
           </div>
         </div>
